@@ -1,0 +1,32 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import EventForm from "@/components/admin/EventForm.astro";
+import { parseEventForm } from "@/server/admin-forms";
+import { createEvent } from "@/server/events";
+
+export const prerender = false;
+
+let values: Record<string, string> = { format: "hybrid", zoomKind: "meeting" };
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const parsed = parseEventForm(form);
+  if (parsed.ok) {
+    const r = await createEvent(Astro.locals.db, parsed.data, Astro.locals.user!.id);
+    if (r.ok) return Astro.redirect(`/admin/dogadaji/${r.id}?ok=stvoreno#karte`, 303);
+    errors = r.errors;
+    values = Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)]));
+  } else {
+    errors = parsed.errors;
+    values = parsed.values;
+  }
+}
+---
+<Admin title="Novi događaj" back={{ href: "/admin", label: "Događaji" }}>
+  {Object.keys(errors).length > 0 && <p role="alert" class="mb-6 rounded-xl bg-pink px-5 py-3 font-medium">Ispravite označena polja.</p>}
+  <form method="post" class="rounded-2xl bg-white p-6 ring-1 ring-ink/5 md:p-8">
+    <EventForm values={values} errors={errors} submitLabel="Spremi kao nacrt" />
+  </form>
+  <p class="mt-4 text-sm text-muted">Nakon spremanja dodajte karte i predavače, pa objavite događaj.</p>
+</Admin>

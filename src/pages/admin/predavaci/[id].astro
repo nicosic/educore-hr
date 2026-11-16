@@ -1,0 +1,45 @@
+---
+import { eq } from "drizzle-orm";
+import Admin from "@/layouts/Admin.astro";
+import LecturerForm from "@/components/admin/LecturerForm.astro";
+import { lecturers } from "@/lib/db/schema";
+import { parseLecturerForm } from "@/server/admin-forms";
+import { deleteLecturer, saveLecturer } from "@/server/events";
+
+export const prerender = false;
+
+const id = Astro.params.id!;
+const db = Astro.locals.db;
+const lecturer = await db.query.lecturers.findFirst({ where: eq(lecturers.id, id) });
+if (!lecturer) return Astro.rewrite("/404");
+
+let values: Record<string, string> = { name: lecturer.name, slug: lecturer.slug, title: lecturer.title ?? "", bio: lecturer.bio ?? "" };
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  if (form.get("_action") === "delete") {
+    await deleteLecturer(db, id, Astro.locals.user!.id);
+    return Astro.redirect("/admin/predavaci?ok=obrisano", 303);
+  }
+  const parsed = parseLecturerForm(form);
+  if (parsed.ok) {
+    const r = await saveLecturer(db, id, parsed.data, Astro.locals.user!.id);
+    if (r.ok) return Astro.redirect(`/admin/predavaci/${id}?ok=spremljeno`, 303);
+    errors = r.errors;
+    values = Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)]));
+  } else {
+    errors = parsed.errors;
+    values = parsed.values;
+  }
+}
+---
+<Admin title={lecturer.name} back={{ href: "/admin/predavaci", label: "Predavači" }}>
+  <form method="post" class="rounded-2xl bg-white p-6 ring-1 ring-ink/5 md:p-8">
+    <LecturerForm values={values} errors={errors} submitLabel="Spremi" />
+  </form>
+  <form method="post" class="mt-6">
+    <input type="hidden" name="_action" value="delete" />
+    <button class="text-sm font-semibold text-red-700 hover:underline" onclick="return confirm('Obrisati predavača? Uklonit će se sa svih događaja.')">Obriši predavača</button>
+  </form>
+</Admin>

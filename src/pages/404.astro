@@ -1,5 +1,9 @@
 ---
 import Base from "@/layouts/Base.astro";
+
+// Renderira se na serveru kako bi se dinamičke rute (npr. nepostojeći događaj) mogle preusmjeriti ovamo.
+export const prerender = false;
+Astro.response.status = 404;
 ---
 <Base title="Stranica nije pronađena" noindex>
   <section class="container-page py-24 text-center">

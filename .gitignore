@@ -6,3 +6,5 @@ dist/
 .env*
 !.dev.vars.example
 .DS_Store
+.cf-auth/
+.env.cloudflare

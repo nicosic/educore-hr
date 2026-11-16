@@ -5,13 +5,53 @@
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "observability": { "enabled": true },
+
+  // ---------------------------------------------------------------------------
+  // Lokalni razvoj (astro dev / wrangler). D1 i R2 su lokalni (Miniflare).
+  // Okruženja preview i production dodaju se kad domena educore.hr bude na Cloudflareu.
+  // ---------------------------------------------------------------------------
   "vars": {
     "APP_ENV": "local",
     "APP_URL": "http://localhost:4321",
     "EMAIL_FROM": "info@educore.hr",
     "EMAIL_FROM_NAME": "eduCORE",
     "INQUIRY_TO": "info@educore.hr",
-    "EMAIL_TRANSPORT": "log"
+    "EMAIL_TRANSPORT": "log",
+    // Adrese koje pri prvoj prijavi automatski dobivaju administratorska prava (odvojene zarezom).
+    "ADMIN_EMAILS": "admin@educore.test"
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "educore-local", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "drizzle" }
+  ],
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "educore-local" }],
+  "ratelimits": [
+    { "name": "RL_MAGIC_LINK", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } }
+  ],
+
+  "env": {
+    // -------------------------------------------------------------------------
+    // Preview: privremena adresa na workers.dev (račun educore-hr). Podaci su u EU jurisdikciji.
+    // ADMIN_EMAILS i BREVO_API_KEY postavljaju se kao tajne (`wrangler secret put ... --env preview`).
+    // R2 (FILES) se dodaje kad se R2 uključi u Cloudflare dashboardu.
+    // -------------------------------------------------------------------------
+    "preview": {
+      "name": "educore-preview",
+      "workers_dev": true,
+      "preview_urls": false,
+      "vars": {
+        "APP_ENV": "preview",
+        "APP_URL": "https://educore-preview.educore-hr.workers.dev",
+        "EMAIL_FROM": "info@educore.hr",
+        "EMAIL_FROM_NAME": "eduCORE (preview)",
+        "INQUIRY_TO": "info@educore.hr",
+        "EMAIL_TRANSPORT": "log"
+      },
+      "d1_databases": [
+        { "binding": "DB", "database_name": "educore-preview", "database_id": "0662b0db-8afd-4e94-bf35-8076980a3730", "migrations_dir": "drizzle" }
+      ],
+      "ratelimits": [
+        { "name": "RL_MAGIC_LINK", "namespace_id": "2001", "simple": { "limit": 3, "period": 60 } }
+      ]
+    }
   }
-  // D1, R2, KV, cron i okruženja (preview/production) dodaju se u fazi 1, vidi docs/PLAN.md.
 }

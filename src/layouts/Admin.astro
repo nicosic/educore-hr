@@ -1,0 +1,67 @@
+---
+import "@/styles/global.css";
+import Logo from "@/components/Logo.astro";
+
+type Props = { title: string; back?: { href: string; label: string } };
+const { title, back } = Astro.props;
+const user = Astro.locals.user!;
+const path = Astro.url.pathname;
+const nav = [
+  { href: "/admin", label: "Događaji", match: (p: string) => p === "/admin" || p.startsWith("/admin/dogadaji") },
+  { href: "/admin/predavaci", label: "Predavači", match: (p: string) => p.startsWith("/admin/predavaci") },
+];
+const flash = Astro.url.searchParams.get("ok");
+const flashText: Record<string, string> = {
+  spremljeno: "Promjene su spremljene.",
+  stvoreno: "Stvoreno.",
+  obrisano: "Obrisano.",
+  objavljeno: "Događaj je objavljen.",
+  skriveno: "Događaj je vraćen u nacrt.",
+};
+---
+<!doctype html>
+<html lang="hr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title} | eduCORE admin</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="bg-cream">
+    <header class="border-b border-ink/10 bg-white">
+      <div class="container-page flex h-16 items-center justify-between gap-4">
+        <div class="flex items-center gap-6">
+          <a href="/admin" class="text-xl"><Logo /> <span class="ml-1 text-sm font-semibold text-muted">admin</span></a>
+          <nav aria-label="Admin navigacija">
+            <ul class="flex gap-1">
+              {
+                nav.map((n) => (
+                  <li>
+                    <a
+                      href={n.href}
+                      class:list={["rounded-full px-4 py-2 text-sm font-medium", n.match(path) ? "bg-ink text-white" : "hover:bg-cream"]}
+                    >
+                      {n.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </div>
+        <div class="flex items-center gap-4 text-sm">
+          <a href="/" class="hidden text-muted hover:text-ink sm:inline">Javna stranica ↗</a>
+          <span class="hidden text-muted md:inline">{user.email}</span>
+          <form method="post" action="/odjava"><button class="font-medium hover:text-teal">Odjava</button></form>
+        </div>
+      </div>
+    </header>
+    <main class="container-page py-8 md:py-10">
+      {back && <a href={back.href} class="text-sm text-muted hover:text-teal">← {back.label}</a>}
+      <h1 class="mt-2 text-3xl md:text-4xl">{title}</h1>
+      {flash && flashText[flash] && <p role="status" class="mt-6 rounded-xl bg-mint px-5 py-3 font-medium">{flashText[flash]}</p>}
+      <div class="mt-8"><slot /></div>
+    </main>
+  </body>
+</html>

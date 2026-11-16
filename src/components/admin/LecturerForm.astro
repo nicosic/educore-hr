@@ -1,0 +1,13 @@
+---
+import Field from "./Field.astro";
+type Props = { values: Record<string, string>; errors: Record<string, string>; submitLabel: string };
+const { values: v, errors: e, submitLabel } = Astro.props;
+---
+<input type="hidden" name="_action" value="save" />
+<div class="grid gap-5 md:grid-cols-2">
+  <Field label="Ime i prezime" name="name" value={v.name} error={e.name} required />
+  <Field label="Adresa stranice (slug)" name="slug" value={v.slug} error={e.slug} hint="Prazno = izradi iz imena." />
+  <Field label="Titula i uloga" name="title" value={v.title} error={e.title} class="md:col-span-2" placeholder="prof. dr. sc., specijalist psihijatrije" />
+  <Field label="Biografija" name="bio" value={v.bio} error={e.bio} textarea rows={6} class="md:col-span-2" />
+</div>
+<button class="btn btn-primary mt-6 !py-2">{submitLabel}</button>

@@ -1,0 +1,223 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import EventForm from "@/components/admin/EventForm.astro";
+import TicketFields from "@/components/admin/TicketFields.astro";
+import { eventToValues, parseEventForm, parseTicketForm, ticketToValues } from "@/server/admin-forms";
+import {
+  addTicket,
+  deleteEvent,
+  deleteTicket,
+  getEventAdmin,
+  listLecturers,
+  setEventLecturers,
+  setEventStatus,
+  updateEvent,
+  updateTicket,
+} from "@/server/events";
+import { EVENT_STATUSES, type EventStatus } from "@/lib/db/schema";
+import { currentPrice, formatEur } from "@/lib/money";
+import { formatRange, formatShortDate } from "@/lib/time";
+
+export const prerender = false;
+
+const id = Astro.params.id!;
+const db = Astro.locals.db;
+const actor = Astro.locals.user!.id;
+
+const loaded = await getEventAdmin(db, id);
+if (!loaded) return Astro.rewrite("/404");
+
+let eventValues = eventToValues(loaded.event);
+let eventErrors: Record<string, string> = {};
+let newTicketValues: Record<string, string> = { isActive: "da" };
+let newTicketErrors: Record<string, string> = {};
+let editTicket: { id: string; values: Record<string, string>; errors: Record<string, string> } | null = null;
+let actionError: string | null = null;
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const action = String(form.get("_action") ?? "");
+  const here = `/admin/dogadaji/${id}`;
+
+  if (action === "event") {
+    const parsed = parseEventForm(form);
+    if (parsed.ok) {
+      const r = await updateEvent(db, id, parsed.data, actor);
+      if (r.ok) return Astro.redirect(`${here}?ok=spremljeno`, 303);
+      eventErrors = r.errors;
+      eventValues = Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)]));
+    } else {
+      eventErrors = parsed.errors;
+      eventValues = parsed.values;
+    }
+  } else if (action === "status") {
+    const status = String(form.get("status")) as EventStatus;
+    if (EVENT_STATUSES.includes(status)) {
+      const r = await setEventStatus(db, id, status, actor);
+      if (r.ok) return Astro.redirect(`${here}?ok=${status === "published" ? "objavljeno" : status === "draft" ? "skriveno" : "spremljeno"}`, 303);
+      actionError = r.error;
+    }
+  } else if (action === "delete") {
+    const r = await deleteEvent(db, id, actor);
+    if (r.ok) return Astro.redirect("/admin?ok=obrisano", 303);
+    actionError = r.error;
+  } else if (action === "ticket-add") {
+    const parsed = parseTicketForm(form);
+    if (parsed.ok) {
+      await addTicket(db, id, parsed.data, actor);
+      return Astro.redirect(`${here}?ok=stvoreno#karte`, 303);
+    }
+    newTicketErrors = parsed.errors;
+    newTicketValues = parsed.values;
+  } else if (action === "ticket-update") {
+    const ticketId = String(form.get("ticketId"));
+    const parsed = parseTicketForm(form);
+    if (parsed.ok) {
+      await updateTicket(db, id, ticketId, parsed.data, actor);
+      return Astro.redirect(`${here}?ok=spremljeno#karte`, 303);
+    }
+    editTicket = { id: ticketId, values: parsed.values, errors: parsed.errors };
+  } else if (action === "ticket-delete") {
+    const r = await deleteTicket(db, id, String(form.get("ticketId")), actor);
+    if (r.ok) return Astro.redirect(`${here}?ok=obrisano#karte`, 303);
+    actionError = r.error;
+  } else if (action === "lecturers") {
+    await setEventLecturers(db, id, form.getAll("lecturerIds").map(String));
+    return Astro.redirect(`${here}?ok=spremljeno#predavaci`, 303);
+  }
+}
+
+const data = (await getEventAdmin(db, id))!;
+const { event, tickets, lecturerIds, sold } = data;
+const allLecturers = await listLecturers(db);
+const now = Date.now();
+const statusLabel = { draft: "Nacrt", published: "Objavljen", cancelled: "Otkazan", finished: "Završen" } as const;
+const statusClass = { draft: "bg-butter", published: "bg-mint", cancelled: "bg-pink", finished: "bg-lilac" } as const;
+const modeLabel = { onsite: "Uživo", online: "Online" } as const;
+---
+<Admin title={event.title} back={{ href: "/admin", label: "Događaji" }}>
+  {actionError && <p role="alert" class="mb-6 rounded-xl bg-pink px-5 py-3 font-medium">{actionError}</p>}
+
+  <!-- Status -->
+  <section class="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-5 ring-1 ring-ink/5">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class:list={["rounded-full px-3 py-1 text-sm font-semibold", statusClass[event.status]]}>{statusLabel[event.status]}</span>
+      <span class="text-sm text-muted">{formatRange(event.startsAt, event.endsAt, event.timezone)}</span>
+      {event.status === "published" && <a href={`/dogadanja/${event.slug}`} class="text-sm font-medium text-teal hover:underline">Javna stranica ↗</a>}
+    </div>
+    <form method="post" class="flex flex-wrap gap-2">
+      <input type="hidden" name="_action" value="status" />
+      {event.status !== "published" && <button name="status" value="published" class="btn btn-primary !py-2">Objavi</button>}
+      {event.status === "published" && <button name="status" value="draft" class="btn btn-secondary !py-2">Vrati u nacrt</button>}
+      {event.status === "published" && event.endsAt < now && <button name="status" value="finished" class="btn btn-secondary !py-2">Označi kao završen</button>}
+      {event.status !== "cancelled" && event.status !== "draft" && (
+        <button name="status" value="cancelled" class="btn !py-2 text-red-700 hover:bg-pink" onclick="return confirm('Otkazati događaj? Polaznike treba obavijestiti.')">Otkaži</button>
+      )}
+    </form>
+  </section>
+
+  <!-- Karte -->
+  <section id="karte" class="mt-10">
+    <h2 class="text-2xl">Karte i cijene</h2>
+    <p class="mt-1 text-muted">Cijene su s PDV-om. Za hibridni događaj dodajte posebnu kartu za uživo i za online.</p>
+
+    {
+      tickets.length > 0 && (
+        <ul class="mt-6 space-y-3">
+          {tickets.map((t) => {
+            const price = currentPrice(t, now);
+            const isEditing = editTicket?.id === t.id;
+            return (
+              <li class="rounded-2xl bg-white ring-1 ring-ink/5">
+                <details open={isEditing}>
+                  <summary class="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 p-5 [&::-webkit-details-marker]:hidden">
+                    <div>
+                      <p class="font-semibold">
+                        {t.name} {!t.isActive && <span class="ml-2 rounded-full bg-cream px-2 py-0.5 text-xs font-medium text-muted">neaktivna</span>}
+                      </p>
+                      <p class="text-sm text-muted">
+                        {modeLabel[t.mode]} • {formatEur(price.cents)}
+                        {price.earlyBird && ` (early bird do ${formatShortDate(t.earlyBirdUntil!)}, zatim ${formatEur(t.priceCents)})`}
+                        {" • "}PDV {t.vatRateBp / 100} %
+                      </p>
+                    </div>
+                    <p class="text-sm">
+                      <strong>{sold[t.id] ?? 0}</strong>
+                      {t.capacity != null ? ` / ${t.capacity} mjesta` : " prijavljenih"}
+                      <span class="ml-3 text-teal">Uredi</span>
+                    </p>
+                  </summary>
+                  <div class="border-t border-ink/5 p-5">
+                    <form method="post">
+                      <input type="hidden" name="_action" value="ticket-update" />
+                      <input type="hidden" name="ticketId" value={t.id} />
+                      <TicketFields values={isEditing ? editTicket!.values : ticketToValues(t)} errors={isEditing ? editTicket!.errors : {}} format={event.format} />
+                      <div class="mt-6 flex flex-wrap gap-3">
+                        <button class="btn btn-primary !py-2">Spremi kartu</button>
+                      </div>
+                    </form>
+                    <form method="post" class="mt-3">
+                      <input type="hidden" name="_action" value="ticket-delete" />
+                      <input type="hidden" name="ticketId" value={t.id} />
+                      <button class="text-sm font-medium text-red-700 hover:underline" onclick="return confirm('Obrisati kartu?')">Obriši kartu</button>
+                    </form>
+                  </div>
+                </details>
+              </li>
+            );
+          })}
+        </ul>
+      )
+    }
+
+    <details class="mt-4 rounded-2xl bg-white ring-1 ring-ink/5" open={tickets.length === 0 || Object.keys(newTicketErrors).length > 0}>
+      <summary class="cursor-pointer list-none p-5 font-semibold text-teal [&::-webkit-details-marker]:hidden">+ Dodaj kartu</summary>
+      <form method="post" class="border-t border-ink/5 p-5">
+        <input type="hidden" name="_action" value="ticket-add" />
+        <TicketFields values={newTicketValues} errors={newTicketErrors} format={event.format} />
+        <button class="btn btn-primary mt-6 !py-2">Dodaj kartu</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- Predavači -->
+  <section id="predavaci" class="mt-12">
+    <h2 class="text-2xl">Predavači</h2>
+    {
+      allLecturers.length === 0 ? (
+        <p class="mt-3 text-muted">Još nema predavača. <a href="/admin/predavaci" class="font-medium text-teal hover:underline">Dodajte predavača</a>.</p>
+      ) : (
+        <form method="post" class="mt-4 rounded-2xl bg-white p-5 ring-1 ring-ink/5">
+          <input type="hidden" name="_action" value="lecturers" />
+          <div class="flex flex-wrap gap-3">
+            {allLecturers.map((l) => (
+              <label class="flex cursor-pointer items-center gap-2 rounded-full border border-ink/15 px-4 py-2 has-[:checked]:border-teal has-[:checked]:bg-mint">
+                <input type="checkbox" name="lecturerIds" value={l.id} checked={lecturerIds.includes(l.id)} class="accent-teal" />
+                {l.name}
+              </label>
+            ))}
+          </div>
+          <button class="btn btn-primary mt-5 !py-2">Spremi predavače</button>
+        </form>
+      )
+    }
+  </section>
+
+  <!-- Podaci o događaju -->
+  <section id="podaci" class="mt-12">
+    <h2 class="text-2xl">Podaci o događaju</h2>
+    {Object.keys(eventErrors).length > 0 && <p role="alert" class="mt-4 rounded-xl bg-pink px-5 py-3 font-medium">Ispravite označena polja.</p>}
+    <form method="post" class="mt-4 rounded-2xl bg-white p-6 ring-1 ring-ink/5 md:p-8">
+      <EventForm values={eventValues} errors={eventErrors} submitLabel="Spremi promjene" />
+    </form>
+  </section>
+
+  <section class="mt-12 rounded-2xl border border-red-200 p-5">
+    <h2 class="text-lg">Brisanje</h2>
+    <p class="mt-1 text-sm text-muted">Događaj se može obrisati samo dok nema narudžbi. Inače ga otkažite.</p>
+    <form method="post" class="mt-3">
+      <input type="hidden" name="_action" value="delete" />
+      <button class="text-sm font-semibold text-red-700 hover:underline" onclick="return confirm('Trajno obrisati događaj?')">Obriši događaj</button>
+    </form>
+  </section>
+</Admin>

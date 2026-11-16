@@ -1,0 +1,152 @@
+---
+import Base from "@/layouts/Base.astro";
+import { academyBySlug, toneClass } from "@/data/academies";
+import { renderMarkdown } from "@/lib/markdown";
+import { currentPrice, formatEur } from "@/lib/money";
+import { formatRange, formatShortDate } from "@/lib/time";
+import { getPublicEvent, registrationOpen } from "@/server/events";
+
+export const prerender = false;
+
+const data = await getPublicEvent(Astro.locals.db, Astro.params.slug!);
+if (!data) return Astro.rewrite("/404");
+
+const { event: e, tickets, lecturers, sold } = data;
+const now = Date.now();
+const academy = academyBySlug(e.academy);
+const open = registrationOpen(e, now);
+const tags = (e.tags ?? "").split(",").map((t) => t.trim()).filter(Boolean);
+const formatLabel = { offline: "Uživo", online: "Online (Zoom)", hybrid: "Uživo i online (Zoom)" } as const;
+const modeLabel = { onsite: "Uživo", online: "Online" } as const;
+const ticketsView = tickets.map((t) => {
+  const left = t.capacity == null ? null : Math.max(0, t.capacity - (sold[t.id] ?? 0));
+  return { t, price: currentPrice(t, now), left, soldOut: left === 0 };
+});
+Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "EducationEvent",
+  name: e.title,
+  description: e.summary ?? e.subtitle ?? undefined,
+  startDate: new Date(e.startsAt).toISOString(),
+  endDate: new Date(e.endsAt).toISOString(),
+  eventStatus: e.status === "cancelled" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
+  eventAttendanceMode:
+    e.format === "online"
+      ? "https://schema.org/OnlineEventAttendanceMode"
+      : e.format === "hybrid"
+        ? "https://schema.org/MixedEventAttendanceMode"
+        : "https://schema.org/OfflineEventAttendanceMode",
+  location:
+    e.format === "online"
+      ? { "@type": "VirtualLocation", url: new URL(`/dogadanja/${e.slug}`, Astro.site).toString() }
+      : { "@type": "Place", name: e.venueName, address: [e.venueAddress, e.city].filter(Boolean).join(", ") },
+  organizer: { "@type": "Organization", name: "eduCORE", url: "https://educore.hr" },
+  performer: lecturers.map((l) => ({ "@type": "Person", name: l.name })),
+  offers: ticketsView.map(({ t, price, soldOut }) => ({
+    "@type": "Offer",
+    name: t.name,
+    price: (price.cents / 100).toFixed(2),
+    priceCurrency: "EUR",
+    availability: soldOut ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+  })),
+};
+---
+<Base title={e.title} description={e.summary ?? e.subtitle ?? `${e.title}: edukacija na eduCORE platformi.`}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, "\\u003c")} />
+
+  <section class="container-page pt-10 md:pt-14">
+    <nav aria-label="Putanja" class="text-sm text-muted">
+      <a href="/dogadanja" class="hover:text-teal">Događanja</a>
+      <span aria-hidden="true" class="mx-1">/</span>
+      {academy && <a href={`/akademije/${academy.slug}`} class="hover:text-teal">{academy.name}</a>}
+    </nav>
+
+    <div class:list={["mt-6 rounded-[var(--radius-card)] p-8 md:p-12", toneClass[academy?.tone ?? "mint"]]}>
+      {e.status === "cancelled" && <p class="mb-4 inline-block rounded-full bg-white px-4 py-1.5 font-semibold text-red-700">Događaj je otkazan</p>}
+      <p class="text-sm font-semibold uppercase tracking-wider text-ink/70">{formatLabel[e.format]}</p>
+      <h1 class="mt-3 text-4xl md:text-6xl">{e.title}</h1>
+      {e.subtitle && <p class="mt-5 max-w-3xl text-xl md:text-2xl">{e.subtitle}</p>}
+      <dl class="mt-8 grid gap-4 text-lg sm:grid-cols-2">
+        <div>
+          <dt class="text-sm font-semibold uppercase tracking-wider text-ink/60">Termin</dt>
+          <dd class="mt-1 font-medium">{formatRange(e.startsAt, e.endsAt, e.timezone)}</dd>
+        </div>
+        <div>
+          <dt class="text-sm font-semibold uppercase tracking-wider text-ink/60">Mjesto</dt>
+          <dd class="mt-1 font-medium">
+            {e.format !== "online" && [e.venueName, e.venueAddress, e.city].filter(Boolean).join(", ")}
+            {e.format === "hybrid" && " ili online"}
+            {e.format === "online" && "Online, Zoom (osobna poveznica stiže e-poštom)"}
+          </dd>
+        </div>
+      </dl>
+      {tags.length > 0 && <ul class="mt-8 flex flex-wrap gap-2">{tags.map((t) => <li class="rounded-full bg-white/70 px-4 py-1.5 text-sm font-medium">{t}</li>)}</ul>}
+    </div>
+  </section>
+
+  <section class="container-page mt-12 grid gap-10 lg:grid-cols-[1.5fr_1fr]">
+    <div>
+      {e.summary && <p class="text-xl leading-relaxed">{e.summary}</p>}
+      {e.description && <div class="prose-legal prose-event mt-6" set:html={renderMarkdown(e.description)} />}
+
+      {
+        lecturers.length > 0 && (
+          <div class="mt-12">
+            <h2 class="text-2xl md:text-3xl">{lecturers.length === 1 ? "Predavač" : "Predavači"}</h2>
+            <ul class="mt-6 space-y-5">
+              {lecturers.map((l) => (
+                <li class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5">
+                  <p class="text-xl font-bold">{l.name}</p>
+                  {l.title && <p class="text-muted">{l.title}</p>}
+                  {l.bio && <div class="mt-3 leading-relaxed" set:html={renderMarkdown(l.bio)} />}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    <aside id="prijava" class="lg:sticky lg:top-24 lg:self-start">
+      <div class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5 md:p-8">
+        <h2 class="text-2xl">Kotizacija</h2>
+        <ul class="mt-6 space-y-4">
+          {
+            ticketsView.map(({ t, price, left, soldOut }) => (
+              <li class="rounded-2xl border border-ink/10 p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="font-semibold">{t.name}</p>
+                    <p class="text-sm text-muted">{modeLabel[t.mode]}{t.description && ` • ${t.description}`}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-lg font-bold">{formatEur(price.cents)}</p>
+                    {price.earlyBird && <p class="text-sm text-muted line-through">{formatEur(t.priceCents)}</p>}
+                  </div>
+                </div>
+                {price.earlyBird && <p class="mt-2 text-sm font-medium text-teal">Early bird do {formatShortDate(t.earlyBirdUntil!, e.timezone)}</p>}
+                {soldOut && <p class="mt-2 text-sm font-semibold text-red-700">Popunjeno</p>}
+                {left != null && !soldOut && left <= 10 && <p class="mt-2 text-sm font-medium">Još {left} {left === 1 ? "mjesto" : "mjesta"}</p>}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-4 text-sm text-muted">Cijene su s PDV-om. Grupe i tvrtke: jedna narudžba i jedan račun za cijeli tim.</p>
+        {
+          open ? (
+            <button type="button" disabled class="btn btn-primary mt-6 w-full cursor-not-allowed opacity-60" title="Online prijave uskoro">
+              Prijave uskoro
+            </button>
+          ) : (
+            <p class="mt-6 rounded-xl bg-cream p-4 text-center font-medium">
+              {e.status === "cancelled" ? "Događaj je otkazan." : "Prijave su zatvorene."}
+            </p>
+          )
+        }
+        <p class="mt-3 text-center text-sm text-muted">Pitanja? <a href="/kontakt" class="underline">Javite nam se</a></p>
+      </div>
+    </aside>
+  </section>
+</Base>

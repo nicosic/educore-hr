@@ -27,5 +27,6 @@ export function backTo(request: Request, fallback: string, state: "poslano" | "g
   }
   target.searchParams.set("stanje", state);
   target.hash = "forma";
-  return Response.redirect(target.toString(), 303);
+  // Ne Response.redirect(): njegova zaglavlja su nepromjenjiva, a middleware dodaje svoja.
+  return new Response(null, { status: 303, headers: { location: target.toString() } });
 }

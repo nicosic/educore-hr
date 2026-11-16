@@ -1,0 +1,51 @@
+---
+/**
+ * Potvrda prijave. Token se troši tek na klik (POST), jer sustavi za filtriranje e-pošte
+ * često sami otvaraju poveznice (GET) i tako bi potrošili jednokratni token.
+ */
+import Base from "@/layouts/Base.astro";
+import { consumeLoginToken, peekLoginToken, safeNextPath, SESSION_COOKIE, SESSION_DAYS } from "@/server/auth";
+
+export const prerender = false;
+
+const token = Astro.url.searchParams.get("t") ?? "";
+const now = Date.now();
+
+if (Astro.request.method === "POST" && token) {
+  const result = await consumeLoginToken(Astro.locals.db, token, now);
+  if (result) {
+    Astro.cookies.set(SESSION_COOKIE, result.sessionId, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_DAYS * 86_400,
+    });
+    const fallback = result.isAdmin ? "/admin" : "/moj-racun";
+    return Astro.redirect(safeNextPath(result.nextPath, fallback), 303);
+  }
+}
+
+const valid = token ? await peekLoginToken(Astro.locals.db, token, now) : null;
+---
+<Base title="Potvrda prijave" noindex>
+  <section class="container-page max-w-xl py-16 md:py-24">
+    {
+      valid ? (
+        <div class="rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-ink/5 md:p-10">
+          <h1 class="text-3xl">Prijava na eduCORE</h1>
+          <p class="mt-4 text-lg text-muted">Prijavljujete se kao <strong class="text-ink">{valid.email}</strong>.</p>
+          <form method="post" class="mt-8">
+            <button class="btn btn-primary w-full">Prijavi se</button>
+          </form>
+        </div>
+      ) : (
+        <div class="rounded-[var(--radius-card)] bg-pink p-8 md:p-10">
+          <h1 class="text-3xl">Poveznica više ne vrijedi</h1>
+          <p class="mt-4 text-lg">Poveznica za prijavu vrijedi 15 minuta i može se iskoristiti samo jednom.</p>
+          <a href="/prijava" class="btn btn-primary mt-8">Zatraži novu poveznicu</a>
+        </div>
+      )
+    }
+  </section>
+</Base>

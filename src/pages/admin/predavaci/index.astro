@@ -1,0 +1,51 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import LecturerForm from "@/components/admin/LecturerForm.astro";
+import { parseLecturerForm } from "@/server/admin-forms";
+import { listLecturers, saveLecturer } from "@/server/events";
+
+export const prerender = false;
+
+let values: Record<string, string> = {};
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const parsed = parseLecturerForm(form);
+  if (parsed.ok) {
+    const r = await saveLecturer(Astro.locals.db, null, parsed.data, Astro.locals.user!.id);
+    if (r.ok) return Astro.redirect("/admin/predavaci?ok=stvoreno", 303);
+    errors = r.errors;
+    values = Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)]));
+  } else {
+    errors = parsed.errors;
+    values = parsed.values;
+  }
+}
+const lecturers = await listLecturers(Astro.locals.db);
+---
+<Admin title="Predavači">
+  {
+    lecturers.length > 0 ? (
+      <ul class="grid gap-3 md:grid-cols-2">
+        {lecturers.map((l) => (
+          <li>
+            <a href={`/admin/predavaci/${l.id}`} class="block rounded-2xl bg-white p-5 ring-1 ring-ink/5 hover:ring-teal">
+              <p class="font-semibold">{l.name}</p>
+              {l.title && <p class="text-sm text-muted">{l.title}</p>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-muted">Još nema predavača.</p>
+    )
+  }
+
+  <details class="mt-8 rounded-2xl bg-white ring-1 ring-ink/5" open={lecturers.length === 0 || Object.keys(errors).length > 0}>
+    <summary class="cursor-pointer list-none p-5 font-semibold text-teal [&::-webkit-details-marker]:hidden">+ Novi predavač</summary>
+    <form method="post" class="border-t border-ink/5 p-5">
+      <LecturerForm values={values} errors={errors} submitLabel="Dodaj predavača" />
+    </form>
+  </details>
+</Admin>

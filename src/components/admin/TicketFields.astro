@@ -1,0 +1,39 @@
+---
+import Field from "./Field.astro";
+
+type Props = { values: Record<string, string>; errors: Record<string, string>; format: "offline" | "online" | "hybrid" };
+const { values: v, errors: e, format } = Astro.props;
+const modes = [
+  { value: "onsite", label: "Uživo (u dvorani)", show: format !== "online" },
+  { value: "online", label: "Online (Zoom)", show: format !== "offline" },
+].filter((m) => m.show);
+const mode = v.mode || modes[0]?.value;
+---
+<div class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+  <Field label="Naziv karte" name="name" value={v.name} error={e.name} required class="md:col-span-2" placeholder="Kotizacija – uživo" />
+  <label class="block md:col-span-2">
+    <span class="mb-1.5 block text-sm font-semibold">Način sudjelovanja *</span>
+    <select name="mode" class="field" required>
+      {modes.map((m) => <option value={m.value} selected={mode === m.value}>{m.label}</option>)}
+    </select>
+    {e.mode && <span class="mt-1 block text-sm font-medium text-red-700">{e.mode}</span>}
+  </label>
+  <Field label="Cijena (EUR, s PDV-om)" name="price" value={v.price} error={e.price} required inputmode="decimal" placeholder="120" />
+  <Field label="Early bird cijena" name="earlyBirdPrice" value={v.earlyBirdPrice} error={e.earlyBirdPrice} inputmode="decimal" />
+  <Field label="Early bird vrijedi do" name="earlyBirdUntil" type="datetime-local" value={v.earlyBirdUntil} error={e.earlyBirdUntil} />
+  <Field label="Kapacitet" name="capacity" type="number" value={v.capacity} error={e.capacity} hint="Prazno = bez ograničenja." />
+  <label class="block">
+    <span class="mb-1.5 block text-sm font-semibold">PDV</span>
+    <select name="vatRate" class="field">
+      {["25", "13", "5", "0"].map((r) => <option value={r} selected={(v.vatRate || "25") === r}>{r} %</option>)}
+    </select>
+    {e.vatRate && <span class="mt-1 block text-sm font-medium text-red-700">{e.vatRate}</span>}
+  </label>
+  <Field label="KPD šifra" name="kpdCode" value={v.kpdCode} error={e.kpdCode} hint="Za eRačun, provjeriti s knjigovođom." placeholder="85.59" />
+  <Field label="Redoslijed" name="sort" type="number" value={v.sort || "0"} />
+  <label class="flex items-center gap-3 self-end pb-3">
+    <input type="checkbox" name="isActive" value="da" checked={v.isActive === "da"} class="size-5 accent-teal" />
+    <span class="font-medium">Aktivna (u prodaji)</span>
+  </label>
+  <Field label="Opis karte" name="description" value={v.description} class="md:col-span-2 lg:col-span-4" placeholder="Uključuje materijale i potvrdu o sudjelovanju." />
+</div>

@@ -1,0 +1,31 @@
+---
+/** Polje admin forme s oznakom, pomoći i porukom greške. */
+type Props = {
+  label: string;
+  name: string;
+  value?: string | null;
+  error?: string;
+  type?: "text" | "number" | "datetime-local" | "email" | "date";
+  required?: boolean;
+  hint?: string;
+  placeholder?: string;
+  textarea?: boolean;
+  rows?: number;
+  class?: string;
+  inputmode?: "decimal" | "numeric" | "text";
+};
+const { label, name, value, error, type = "text", required, hint, placeholder, textarea, rows = 4, class: cls, inputmode } = Astro.props;
+const id = `f-${name}-${Math.random().toString(36).slice(2, 7)}`;
+---
+<label class:list={["block", cls]} for={id}>
+  <span class="mb-1.5 block text-sm font-semibold">{label}{required && " *"}</span>
+  {
+    textarea ? (
+      <textarea id={id} name={name} rows={rows} class:list={["field", error && "!border-red-500"]} required={required} placeholder={placeholder} aria-invalid={error ? "true" : undefined}>{value ?? ""}</textarea>
+    ) : (
+      <input id={id} name={name} type={type} value={value ?? ""} class:list={["field", error && "!border-red-500"]} required={required} placeholder={placeholder} inputmode={inputmode} aria-invalid={error ? "true" : undefined} />
+    )
+  }
+  {hint && !error && <span class="mt-1 block text-sm text-muted">{hint}</span>}
+  {error && <span class="mt-1 block text-sm font-medium text-red-700">{error}</span>}
+</label>

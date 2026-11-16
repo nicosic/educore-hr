@@ -1,0 +1,82 @@
+---
+import { env } from "cloudflare:workers";
+import Base from "@/layouts/Base.astro";
+import { sendEmail, type MailEnv } from "@/lib/email";
+import { isEmail } from "@/lib/forms";
+import { issueLoginToken, LOGIN_TOKEN_MS, parseAdminEmails, safeNextPath } from "@/server/auth";
+
+export const prerender = false;
+
+const next = safeNextPath(Astro.url.searchParams.get("next"));
+let state: "form" | "sent" | "invalid" | "limited" = "form";
+let email = "";
+
+if (Astro.locals.user && Astro.request.method === "GET") {
+  return Astro.redirect(next);
+}
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 254);
+  if (!isEmail(email)) {
+    state = "invalid";
+  } else {
+    const { success } = await env.RL_MAGIC_LINK.limit({ key: email });
+    if (!success) {
+      state = "limited";
+    } else {
+      const token = await issueLoginToken(Astro.locals.db, email, {
+        adminEmails: parseAdminEmails(env.ADMIN_EMAILS),
+        nextPath: next,
+        now: Date.now(),
+      });
+      if (token) {
+        const link = new URL(`/prijava/potvrda?t=${encodeURIComponent(token)}`, env.APP_URL).toString();
+        const minutes = LOGIN_TOKEN_MS / 60_000;
+        await sendEmail(env as unknown as MailEnv, {
+          to: { email },
+          subject: "Vaša poveznica za prijavu na eduCORE",
+          text: `Pozdrav,\n\nza prijavu na eduCORE otvorite ovu poveznicu (vrijedi ${minutes} minuta i može se iskoristiti jednom):\n\n${link}\n\nAko niste zatražili prijavu, slobodno zanemarite ovu poruku.\n\neduCORE`,
+          html: `<p>Pozdrav,</p><p>za prijavu na eduCORE kliknite na gumb. Poveznica vrijedi ${minutes} minuta i može se iskoristiti jednom.</p><p><a href="${link}" style="display:inline-block;background:#1a7f78;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600">Prijavi se</a></p><p style="color:#66748a;font-size:13px">Ako niste zatražili prijavu, slobodno zanemarite ovu poruku.</p>`,
+          tag: "magic-link",
+        });
+        if (env.APP_ENV === "local") console.log(JSON.stringify({ msg: "dev.magic_link", link }));
+      }
+      // Isti odgovor postoji li račun ili ne.
+      state = "sent";
+    }
+  }
+}
+---
+<Base title="Prijava" noindex>
+  <section class="container-page max-w-xl py-16 md:py-24">
+    {
+      state === "sent" ? (
+        <div class="rounded-[var(--radius-card)] bg-mint p-8 md:p-10">
+          <h1 class="text-3xl">Provjerite e-poštu</h1>
+          <p class="mt-4 text-lg">
+            Ako za <strong>{email}</strong> postoji račun, poslali smo poveznicu za prijavu. Vrijedi 15 minuta.
+          </p>
+          <p class="mt-4 text-muted">Nema poruke? Provjerite mapu neželjene pošte ili <a href="/prijava" class="underline">pokušajte ponovno</a>.</p>
+        </div>
+      ) : (
+        <div class="rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-ink/5 md:p-10">
+          <p class="eyebrow">Moj račun</p>
+          <h1 class="mt-3 text-3xl md:text-4xl">Prijava</h1>
+          <p class="mt-4 text-muted">
+            Upišite e-adresu s kojom ste se prijavili na edukaciju. Poslat ćemo vam poveznicu za prijavu, bez lozinke.
+          </p>
+          {state === "invalid" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Upišite ispravnu e-adresu.</p>}
+          {state === "limited" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Previše pokušaja. Pričekajte minutu pa pokušajte ponovno.</p>}
+          <form method="post" class="mt-8">
+            <label class="block">
+              <span class="mb-1.5 block font-medium">E-pošta</span>
+              <input class="field" type="email" name="email" value={email} required maxlength="254" autocomplete="email" autofocus />
+            </label>
+            <button class="btn btn-primary mt-6 w-full">Pošalji poveznicu</button>
+          </form>
+        </div>
+      )
+    }
+  </section>
+</Base>

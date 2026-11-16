@@ -1,0 +1,59 @@
+---
+import Field from "./Field.astro";
+import { academies } from "@/data/academies";
+
+type Props = { values: Record<string, string>; errors: Record<string, string>; submitLabel: string };
+const { values: v, errors: e, submitLabel } = Astro.props;
+const formats = [
+  { value: "offline", label: "Uživo" },
+  { value: "online", label: "Online (Zoom)" },
+  { value: "hybrid", label: "Hibridno (uživo i online)" },
+];
+---
+<input type="hidden" name="_action" value="event" />
+<div class="grid gap-6 lg:grid-cols-2">
+  <Field label="Naslov" name="title" value={v.title} error={e.title} required class="lg:col-span-2" />
+  <Field label="Podnaslov / ključno pitanje" name="subtitle" value={v.subtitle} error={e.subtitle} class="lg:col-span-2" placeholder="Kako ostati stabilan u svijetu visokih očekivanja?" />
+  <Field label="Adresa stranice (slug)" name="slug" value={v.slug} error={e.slug} hint="Prazno = izradi iz naslova. Primjer: masterclass-mentalna-otpornost" />
+  <label class="block">
+    <span class="mb-1.5 block text-sm font-semibold">Akademija *</span>
+    <select name="academy" class="field" required>
+      <option value="">Odaberite</option>
+      {academies.map((a) => <option value={a.slug} selected={v.academy === a.slug}>{a.name}</option>)}
+    </select>
+    {e.academy && <span class="mt-1 block text-sm font-medium text-red-700">{e.academy}</span>}
+  </label>
+  <fieldset class="lg:col-span-2">
+    <legend class="mb-2 text-sm font-semibold">Format *</legend>
+    <div class="flex flex-wrap gap-3">
+      {
+        formats.map((f) => (
+          <label class="flex cursor-pointer items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2 has-[:checked]:border-teal has-[:checked]:bg-mint">
+            <input type="radio" name="format" value={f.value} checked={v.format === f.value} required class="accent-teal" />
+            {f.label}
+          </label>
+        ))
+      }
+    </div>
+    {e.format && <span class="mt-1 block text-sm font-medium text-red-700">{e.format}</span>}
+  </fieldset>
+  <Field label="Početak" name="startsAt" type="datetime-local" value={v.startsAt} error={e.startsAt} required hint="Vrijeme po Zagrebu." />
+  <Field label="Završetak" name="endsAt" type="datetime-local" value={v.endsAt} error={e.endsAt} required />
+  <Field label="Mjesto održavanja" name="venueName" value={v.venueName} error={e.venueName} hint="Za događaje uživo i hibridne." />
+  <Field label="Grad" name="city" value={v.city} error={e.city} />
+  <Field label="Adresa" name="venueAddress" value={v.venueAddress} error={e.venueAddress} class="lg:col-span-2" />
+  <label class="block">
+    <span class="mb-1.5 block text-sm font-semibold">Zoom</span>
+    <select name="zoomKind" class="field">
+      <option value="">Bez Zooma (samo uživo)</option>
+      <option value="meeting" selected={v.zoomKind === "meeting"}>Meeting (do 100 sudionika na Pro paketu)</option>
+      <option value="webinar" selected={v.zoomKind === "webinar"}>Webinar (traži Webinar licencu)</option>
+    </select>
+    {e.zoomKind && <span class="mt-1 block text-sm font-medium text-red-700">{e.zoomKind}</span>}
+  </label>
+  <Field label="Prijave se zatvaraju" name="registrationClosesAt" type="datetime-local" value={v.registrationClosesAt} error={e.registrationClosesAt} hint="Prazno = na početku događaja." />
+  <Field label="Sažetak" name="summary" value={v.summary} error={e.summary} textarea rows={2} class="lg:col-span-2" hint="Jedna do dvije rečenice za popis događaja." />
+  <Field label="Opis" name="description" value={v.description} error={e.description} textarea rows={10} class="lg:col-span-2" hint="Prazan red = novi odlomak, „- ” na početku retka = lista, **tekst** = podebljano." />
+  <Field label="Teme" name="tags" value={v.tags} error={e.tags} class="lg:col-span-2" hint="Odvojene zarezom: Stres, mentalna otpornost, burnout" />
+</div>
+<button class="btn btn-primary mt-8">{submitLabel}</button>

@@ -1,0 +1,53 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { academyBySlug } from "@/data/academies";
+import { listEventsAdmin } from "@/server/events";
+import { formatShortDate, formatTime } from "@/lib/time";
+import { plural } from "@/lib/format";
+
+export const prerender = false;
+
+const rows = await listEventsAdmin(Astro.locals.db);
+const now = Date.now();
+const statusLabel = { draft: "Nacrt", published: "Objavljen", cancelled: "Otkazan", finished: "Završen" } as const;
+const statusClass = { draft: "bg-butter", published: "bg-mint", cancelled: "bg-pink", finished: "bg-lilac" } as const;
+const formatLabel = { offline: "Uživo", online: "Online", hybrid: "Hibridno" } as const;
+---
+<Admin title="Događaji">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <p class="text-muted">{rows.length === 0 ? "Još nema događaja." : `${rows.length} ${plural(rows.length, "događaj", "događaja", "događaja")}`}</p>
+    <a href="/admin/dogadaji/novi" class="btn btn-primary">+ Novi događaj</a>
+  </div>
+
+  {
+    rows.length > 0 && (
+      <div class="mt-6 overflow-x-auto rounded-2xl bg-white ring-1 ring-ink/5">
+        <table class="w-full min-w-[720px] text-left">
+          <thead class="border-b border-ink/10 text-sm text-muted">
+            <tr>
+              <th class="px-5 py-3 font-semibold">Događaj</th>
+              <th class="px-5 py-3 font-semibold">Termin</th>
+              <th class="px-5 py-3 font-semibold">Format</th>
+              <th class="px-5 py-3 font-semibold">Polaznici</th>
+              <th class="px-5 py-3 font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(({ event: e, registered, tickets }) => (
+              <tr class:list={["border-b border-ink/5 last:border-0", e.endsAt < now && "opacity-60"]}>
+                <td class="px-5 py-4">
+                  <a href={`/admin/dogadaji/${e.id}`} class="font-semibold hover:text-teal">{e.title}</a>
+                  <p class="text-sm text-muted">{academyBySlug(e.academy)?.name} • {tickets} {plural(tickets, "karta", "karte", "karata")}</p>
+                </td>
+                <td class="px-5 py-4 text-sm">{formatShortDate(e.startsAt, e.timezone)}<br /><span class="text-muted">{formatTime(e.startsAt, e.timezone)}</span></td>
+                <td class="px-5 py-4 text-sm">{formatLabel[e.format]}</td>
+                <td class="px-5 py-4 text-sm font-semibold">{registered}</td>
+                <td class="px-5 py-4"><span class:list={["rounded-full px-3 py-1 text-sm font-medium", statusClass[e.status]]}>{statusLabel[e.status]}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+</Admin>
