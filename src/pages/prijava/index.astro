@@ -3,18 +3,26 @@ import { env } from "cloudflare:workers";
 import Base from "@/layouts/Base.astro";
 import { sendEmail, type MailEnv } from "@/lib/email";
 import { isEmail } from "@/lib/forms";
-import { issueLoginToken, LOGIN_TOKEN_MS, parseAdminEmails, previewCodeAllows, safeNextPath } from "@/server/auth";
+import {
+  issueLoginToken,
+  LOGIN_TOKEN_MS,
+  parseAdminEmails,
+  previewCodeAllows,
+  previewCodeLocked,
+  recordPreviewCodeFailure,
+  safeNextPath,
+} from "@/server/auth";
 
 export const prerender = false;
 
 const next = safeNextPath(Astro.url.searchParams.get("next"));
-let state: "form" | "sent" | "invalid" | "limited" | "badcode" | "direct" = "form";
+let state: "form" | "sent" | "invalid" | "limited" | "badcode" | "locked" | "direct" = "form";
 let email = "";
 let directLink = "";
 const appEnv = env.APP_ENV as string;
 const secretEnv = env as unknown as { PREVIEW_ACCESS_CODE?: string };
 // Polje za pristupni kod postoji samo na previewu, i to samo kad je kod postavljen.
-const codeEnabled = appEnv === "preview" && (secretEnv.PREVIEW_ACCESS_CODE?.trim().length ?? 0) >= 16;
+const codeEnabled = appEnv === "preview" && !!secretEnv.PREVIEW_ACCESS_CODE?.trim();
 
 if (Astro.locals.user && Astro.request.method === "GET") {
   return Astro.redirect(next);
@@ -34,8 +42,11 @@ if (Astro.request.method === "POST") {
       env.RL_MAGIC_LINK.limit({ key: `kod:${ip}` }),
       env.RL_MAGIC_LINK.limit({ key: `kod:${email}` }),
     ]);
+    const now = Date.now();
     if (!byIp.success || !byEmail.success) {
       state = "limited";
+    } else if (await previewCodeLocked(Astro.locals.db, email, now)) {
+      state = "locked";
     } else if (await previewCodeAllows({ appEnv, configuredCode: secretEnv.PREVIEW_ACCESS_CODE, givenCode, email, adminEmails })) {
       const token = await issueLoginToken(Astro.locals.db, email, { adminEmails, nextPath: next, now: Date.now() });
       if (token) {
@@ -45,6 +56,7 @@ if (Astro.request.method === "POST") {
         state = "badcode";
       }
     } else {
+      await recordPreviewCodeFailure(Astro.locals.db, email, now);
       state = "badcode";
     }
   } else {
@@ -101,6 +113,7 @@ if (Astro.request.method === "POST") {
             Upišite e-adresu s kojom ste se prijavili na edukaciju. Poslat ćemo vam poveznicu za prijavu, bez lozinke.
           </p>
           {state === "invalid" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Upišite ispravnu e-adresu.</p>}
+          {state === "locked" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Previše krivih kodova za ovu adresu. Pokušajte ponovno za 24 sata.</p>}
           {state === "badcode" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Pristupni kod nije ispravan ili adresa nema administratorska prava.</p>}
           {state === "limited" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Previše pokušaja. Pričekajte minutu pa pokušajte ponovno.</p>}
           <form method="post" class="mt-8">

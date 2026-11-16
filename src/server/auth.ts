@@ -7,12 +7,12 @@
  * Tko se može prijaviti: postojeći korisnik, adresa iz ADMIN_EMAILS (račun se stvara i dobiva admin prava)
  * i polaznik koji ima prijavu na događaj (račun se stvara pri prvoj prijavi).
  */
-import { and, eq, gt, isNull, lt } from "drizzle-orm";
+import { and, count, eq, gt, isNull, lt } from "drizzle-orm";
 import { ulid } from "ulid";
 import { audit } from "@/lib/audit";
 import { randomToken, sha256Hex } from "@/lib/crypto";
 import type { Db } from "@/lib/db";
-import { authTokens, registrations, sessions, users } from "@/lib/db/schema";
+import { auditLog, authTokens, registrations, sessions, users } from "@/lib/db/schema";
 
 export const SESSION_COOKIE = "__Host-educore_session";
 export const SESSION_DAYS = 30;
@@ -146,7 +146,8 @@ export async function purgeExpiredAuth(db: Db, now: number) {
 
 /**
  * Pristupni kod za preview (dok nema e-pošte): uz ispravan kod admin dobiva poveznicu na ekranu.
- * Radi isključivo kad je APP_ENV "preview", kod je postavljen (najmanje 16 znakova) i adresa je u ADMIN_EMAILS.
+ * Radi isključivo kad je APP_ENV "preview", kod je postavljen i adresa je u ADMIN_EMAILS.
+ * Kod smije biti kratak (testno okruženje), pa je zaštita od pogađanja zaključavanje (vidi previewCodeLocked).
  * Usporedba ide preko SHA-256 sažetaka, pa ne ovisi o tome koliko se znakova poklapa.
  */
 export async function previewCodeAllows(
@@ -154,10 +155,41 @@ export async function previewCodeAllows(
 ): Promise<boolean> {
   if (opts.appEnv !== "preview") return false;
   const configured = opts.configuredCode?.trim() ?? "";
-  if (configured.length < 16 || !opts.givenCode) return false;
+  if (!configured || !opts.givenCode) return false;
   if (!opts.adminEmails.has(normalizeEmail(opts.email))) return false;
   const [a, b] = await Promise.all([sha256Hex(configured), sha256Hex(opts.givenCode.trim())]);
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
+}
+
+export const PREVIEW_CODE_MAX_FAILURES = 10;
+const PREVIEW_CODE_WINDOW_MS = 24 * 3_600_000;
+
+/** Neuspjeli pokušaj koda bilježi se uz sažetak adrese (bez osobnih podataka u logu). */
+export async function recordPreviewCodeFailure(db: Db, email: string, now: number) {
+  await db.insert(auditLog).values({
+    id: ulid(now),
+    at: now,
+    actorType: "system",
+    action: "auth.preview_code_fail",
+    entityType: "email_hash",
+    entityId: await sha256Hex(normalizeEmail(email)),
+  });
+}
+
+/** Nakon 10 krivih kodova u 24 sata adresa je zaključana do isteka tog razdoblja. */
+export async function previewCodeLocked(db: Db, email: string, now: number): Promise<boolean> {
+  const [{ n }] = await db
+    .select({ n: count() })
+    .from(auditLog)
+    .where(
+      and(
+        eq(auditLog.action, "auth.preview_code_fail"),
+        eq(auditLog.entityType, "email_hash"),
+        eq(auditLog.entityId, await sha256Hex(normalizeEmail(email))),
+        gt(auditLog.at, now - PREVIEW_CODE_WINDOW_MS),
+      ),
+    );
+  return n >= PREVIEW_CODE_MAX_FAILURES;
 }

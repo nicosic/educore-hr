@@ -63,10 +63,27 @@ describe("pristupni kod za preview", () => {
     expect(await previewCodeAllows({ ...base, givenCode: "krivi-kod-od-barem-16" })).toBe(false);
     expect(await previewCodeAllows({ ...base, email: "netko@example.com" })).toBe(false);
   });
-  it("nikad u produkciji ni lokalno, ni s prekratkim kodom", async () => {
+  it("kratak kod je dopušten", async () => {
+    expect(await previewCodeAllows({ ...base, configuredCode: "007", givenCode: " 007 " })).toBe(true);
+    expect(await previewCodeAllows({ ...base, configuredCode: "007", givenCode: "008" })).toBe(false);
+  });
+  it("nikad u produkciji ni lokalno, ni bez koda", async () => {
     expect(await previewCodeAllows({ ...base, appEnv: "production" })).toBe(false);
     expect(await previewCodeAllows({ ...base, appEnv: "local" })).toBe(false);
-    expect(await previewCodeAllows({ ...base, configuredCode: "kratko", givenCode: "kratko" })).toBe(false);
+    expect(await previewCodeAllows({ ...base, configuredCode: "007", givenCode: "" })).toBe(false);
     expect(await previewCodeAllows({ ...base, configuredCode: undefined })).toBe(false);
+  });
+});
+
+import { PREVIEW_CODE_MAX_FAILURES, previewCodeLocked, recordPreviewCodeFailure } from "@/server/auth";
+describe("zaključavanje pristupnog koda", () => {
+  beforeEach(resetDb);
+  it("nakon 10 krivih kodova u 24 h adresa je zaključana", async () => {
+    for (let i = 0; i < PREVIEW_CODE_MAX_FAILURES - 1; i++) await recordPreviewCodeFailure(db(), "admin@educore.test", T0 + i);
+    expect(await previewCodeLocked(db(), "Admin@educore.test", T0 + 100)).toBe(false);
+    await recordPreviewCodeFailure(db(), "admin@educore.test", T0 + 50);
+    expect(await previewCodeLocked(db(), "admin@educore.test", T0 + 100)).toBe(true);
+    expect(await previewCodeLocked(db(), "druga@educore.test", T0 + 100)).toBe(false);
+    expect(await previewCodeLocked(db(), "admin@educore.test", T0 + 25 * 3_600_000)).toBe(false);
   });
 });
