@@ -1,0 +1,31 @@
+---
+import Legal from "@/layouts/Legal.astro";
+import { site } from "@/data/site";
+const c = site.company;
+---
+<Legal title="Zaštita privatnosti" description="Kako eduCORE prikuplja, koristi i štiti osobne podatke polaznika i posjetitelja." updated="[datum objave]">
+  <h2>1. Voditelj obrade</h2>
+  <p>Voditelj obrade osobnih podataka je {c.name}, {c.address}, OIB {c.oib} (dalje: eduCORE). Za sva pitanja o zaštiti podataka pišite na <a href={`mailto:${site.email}`} class="text-teal underline">{site.email}</a>. [Kontakt službenika za zaštitu podataka, ako je imenovan.]</p>
+
+  <h2>2. Koje podatke obrađujemo i zašto</h2>
+  <ul>
+    <li><strong>Prijava na edukaciju:</strong> ime i prezime, e-pošta, podaci tvrtke za račun (naziv, OIB, adresa). Svrha: provedba ugovora o sudjelovanju, izdavanje računa i potvrda. Pravna osnova: izvršenje ugovora i zakonske obveze (čl. 6. st. 1. b) i c) GDPR-a).</li>
+    <li><strong>Online sudjelovanje:</strong> ime i e-pošta prosljeđuju se Zoomu radi izrade osobne poveznice za ulaz, a evidencija prisutnosti služi za izdavanje potvrde. Pravna osnova: izvršenje ugovora.</li>
+    <li><strong>Sudjelovanje uživo:</strong> podaci za ulaznicu i evidenciju dolaska vode se u sustavu Akredo. Pravna osnova: izvršenje ugovora.</li>
+    <li><strong>Upiti i kontakt:</strong> podaci iz forme koriste se isključivo za odgovor na upit. Pravna osnova: legitimni interes i radnje prije sklapanja ugovora.</li>
+    <li><strong>Obavijesti o edukacijama:</strong> e-pošta, samo uz vašu privolu, koju možete povući u svakom trenutku. Pravna osnova: privola.</li>
+    <li><strong>Plaćanje:</strong> podatke o kartici obrađuje isključivo Stripe. eduCORE ih ne vidi niti pohranjuje.</li>
+  </ul>
+
+  <h2>3. Primatelji i izvršitelji obrade</h2>
+  <p>Podatke dijelimo samo s pružateljima usluga koji nam pomažu u radu, uz ugovor o obradi podataka: Cloudflare (hosting, podaci pohranjeni u EU), Brevo (e-pošta), Stripe (plaćanje), Zoom (online edukacije), [pružatelj usluge fiskalizacije i eRačuna] i [knjigovodstveni servis].</p>
+
+  <h2>4. Rok čuvanja</h2>
+  <p>Podatke o prijavama čuvamo [X godina] od završetka edukacije, a račune koliko propisuju porezni propisi. Podatke za obavijesti čuvamo dok ne povučete privolu.</p>
+
+  <h2>5. Vaša prava</h2>
+  <p>Imate pravo na pristup, ispravak, brisanje, ograničenje obrade, prenosivost podataka i prigovor, te pravo povući privolu. Pritužbu možete podnijeti Agenciji za zaštitu osobnih podataka (azop.hr).</p>
+
+  <h2>6. Kolačići i analitika</h2>
+  <p>Koristimo samo nužne kolačiće i analitiku bez kolačića. Više na stranici <a href="/kolacici" class="text-teal underline">Kolačići</a>.</p>
+</Legal>

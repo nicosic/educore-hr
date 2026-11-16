@@ -1,0 +1,10 @@
+---
+// Dekorativni krugovi s naslovnice koncepta.
+type Props = { class?: string };
+const { class: cls = "" } = Astro.props;
+---
+<svg class={cls} viewBox="0 0 640 760" aria-hidden="true" focusable="false">
+  <circle cx="400" cy="230" r="230" fill="var(--color-pink)" />
+  <circle cx="430" cy="570" r="190" fill="var(--color-mint)" />
+  <circle cx="130" cy="520" r="125" fill="var(--color-butter)" />
+</svg>

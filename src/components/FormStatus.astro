@@ -1,0 +1,20 @@
+---
+// Poruka nakon slanja forme. Stranice su statične, pa stanje (?stanje=poslano|greska) čita mala skripta.
+type Props = { success: string; error?: string };
+const { success, error = "Provjerite jesu li sva obavezna polja ispravno ispunjena pa pokušajte ponovno." } = Astro.props;
+---
+<div data-form-status hidden role="status" class="mb-6 rounded-2xl p-5 font-medium">
+  <p data-ok hidden>{success}</p>
+  <p data-err hidden>{error}</p>
+</div>
+<script is:inline>
+  (() => {
+    const s = new URLSearchParams(location.search).get("stanje");
+    if (s !== "poslano" && s !== "greska") return;
+    document.querySelectorAll("[data-form-status]").forEach((box) => {
+      box.hidden = false;
+      box.classList.add(s === "poslano" ? "bg-mint" : "bg-pink");
+      box.querySelector(s === "poslano" ? "[data-ok]" : "[data-err]").hidden = false;
+    });
+  })();
+</script>

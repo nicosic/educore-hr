@@ -1,0 +1,118 @@
+---
+import Base from "@/layouts/Base.astro";
+import Card from "@/components/Card.astro";
+import Circles from "@/components/Circles.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import { academies, overviewTones } from "@/data/academies";
+import { community, formats, outcomes, pillars } from "@/data/site";
+import { featuredEvent } from "@/data/events";
+---
+<Base>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="container-page grid items-center gap-10 pb-20 pt-14 md:pt-20 lg:grid-cols-[1.2fr_1fr]">
+      <div>
+        <p class="inline-flex rounded-full bg-lilac px-4 py-2 text-xs font-bold tracking-[0.14em]">IDEJE • EDUKACIJE • ZAJEDNICA</p>
+        <h1 class="mt-8 text-5xl leading-[1.05] md:text-7xl">Znanje koje pokreće ljude i poslovanje.</h1>
+        <p class="mt-6 max-w-xl text-lg text-muted md:text-xl">
+          Regionalna platforma za edukacije, radionice i profesionalni razvoj. Učite od priznatih stručnjaka i primijenite znanje
+          već sutra.
+        </p>
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href="/dogadanja" class="btn btn-primary">Pogledaj događanja</a>
+          <a href="/akademije" class="btn btn-secondary">Upoznaj akademije</a>
+        </div>
+      </div>
+      <Circles class="mx-auto w-full max-w-md lg:max-w-none" />
+    </div>
+  </section>
+
+  <!-- Naša ideja -->
+  <section class="container-page py-16">
+    <SectionHeading
+      eyebrow="Naša ideja"
+      title="Jedno mjesto. Mnogo novih mogućnosti."
+      lead="Edukacije koje spajaju znanje priznatih stručnjaka s izazovima svakodnevnog poslovanja."
+    />
+    <div class="mt-12 grid gap-5 md:grid-cols-3">
+      {pillars.map((p) => <Card title={p.title} tone={p.tone} size="lg"><p>{p.text}</p></Card>)}
+    </div>
+  </section>
+
+  <!-- Prvi događaj -->
+  <section class="container-page py-16">
+    <SectionHeading eyebrow="Prvi događaj" title={featuredEvent.title} lead={featuredEvent.lead} />
+    <div class="mt-12 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+      <div class="flex min-h-80 flex-col justify-between rounded-[var(--radius-card)] bg-pink p-8 md:p-10">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wider text-ink/70">{featuredEvent.when}</p>
+          <h3 class="mt-4 text-3xl md:text-4xl">{featuredEvent.question}</h3>
+        </div>
+        <p class="mt-8 text-lg">{featuredEvent.tags.join(" • ")}</p>
+      </div>
+      <div class="flex flex-col justify-between rounded-[var(--radius-card)] bg-mint p-8">
+        <div>
+          <h3 class="text-2xl">Doživljaj koji se pamti</h3>
+          <p class="mt-3 leading-relaxed">Predavanje uživo, moderirani razgovor, pitanja publike i dostupna snimka za sve polaznike.</p>
+        </div>
+        <a href="/dogadanja" class="btn btn-primary mt-8 self-start">Obavijesti me o prijavama</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Akademije -->
+  <section class="container-page py-16">
+    <SectionHeading eyebrow="Šest akademija" title="eduCORE ekosustav" lead="Šest povezanih područja za ljude, timove i organizacije." />
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        academies.map((a, i) => (
+          <Card title={a.name} tone={overviewTones[i]} href={`/akademije/${a.slug}`}>
+            <p>{a.short}</p>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Načini učenja -->
+  <section class="container-page py-16">
+    <SectionHeading eyebrow="Načini učenja" title="Edukacija po mjeri polaznika" lead="Različiti formati, jedna dosljedna kvaliteta iskustva." />
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {formats.map((f) => <Card title={f.title} tone={f.tone}><p>{f.text}</p></Card>)}
+    </div>
+  </section>
+
+  <!-- Potvrde i alati -->
+  <section class="container-page py-16">
+    <SectionHeading
+      eyebrow="Potvrde i praktični alati"
+      title="Znanje koje se može pokazati"
+      lead="Edukacije završavaju potvrdom o sudjelovanju i konkretnim radnim materijalima."
+    />
+    <div class="mt-12 grid gap-5 md:grid-cols-3">
+      {outcomes.map((o) => <Card title={o.title} tone={o.tone}><p>{o.text}</p></Card>)}
+    </div>
+    <p class="mt-6 text-sm text-muted">Službeni ispiti i certifikati ovise o odobrenjima partnerskih tijela.</p>
+  </section>
+
+  <!-- Zajednica -->
+  <section class="container-page py-16">
+    <SectionHeading eyebrow="Zajednica i regija" title="Od edukacije do zajednice znanja" lead="Platforma koja povezuje stručnjake i polaznike u Hrvatskoj i regiji." />
+    <div class="mt-12 grid gap-5 md:grid-cols-3">
+      {community.map((c) => <Card title={c.title} tone={c.tone}><p>{c.text}</p></Card>)}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container-page pt-16">
+    <div class="rounded-[2rem] bg-mint px-8 py-14 md:px-14 md:py-20">
+      <p class="text-4xl font-extrabold tracking-tight text-teal md:text-5xl">eduCORE.</p>
+      <h2 class="mt-6 text-4xl md:text-6xl">Uči. Primijeni. Rasti.</h2>
+      <p class="mt-5 max-w-xl text-lg">Trebate edukaciju za cijeli tim? Pripremamo zatvorene programe prilagođene vašoj organizaciji.</p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="/za-tvrtke" class="btn btn-primary">Program za tvrtke</a>
+        <a href="/dogadanja" class="btn bg-white text-ink hover:bg-cream">Nadolazeća događanja</a>
+      </div>
+    </div>
+  </section>
+</Base>

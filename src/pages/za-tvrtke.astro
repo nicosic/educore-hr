@@ -1,0 +1,97 @@
+---
+import Base from "@/layouts/Base.astro";
+import Card from "@/components/Card.astro";
+import FormStatus from "@/components/FormStatus.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import { academies } from "@/data/academies";
+
+const steps = [
+  { title: "1. Razgovor", text: "Upoznamo vaš tim, izazove i ciljeve koje edukacija treba ostvariti.", tone: "pink" as const },
+  { title: "2. Prijedlog programa", text: "Predložimo predavače, teme, format i trajanje, uz jasnu ponudu.", tone: "sky" as const },
+  { title: "3. Provedba", text: "Uživo kod vas, u našem prostoru ili online, s materijalima za polaznike.", tone: "butter" as const },
+  { title: "4. Potvrde i praćenje", text: "Potvrde o sudjelovanju i preporuke za daljnji razvoj tima.", tone: "mint" as const },
+];
+---
+<Base title="Za tvrtke" description="Zatvoreni programi edukacija prilagođeni vašim timovima: vodstvo, kibernetička sigurnost, usklađenost, ugovori, nabava i razvoj zaposlenika.">
+  <section class="container-page pt-14 md:pt-20">
+    <SectionHeading
+      as="h1"
+      eyebrow="Za tvrtke"
+      title="Edukacija po mjeri vašeg tima"
+      lead="Zatvoreni programi za tvrtke, javni sektor i profesionalne udruge. Teme biramo prema stvarnim izazovima vaše organizacije, a predavači dolaze iz prakse."
+    />
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {steps.map((s) => <Card title={s.title} tone={s.tone}><p>{s.text}</p></Card>)}
+    </div>
+  </section>
+
+  <section id="forma" class="container-page mt-20 grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+    <div>
+      <h2 class="text-3xl md:text-4xl">Pošaljite upit</h2>
+      <p class="mt-4 text-lg text-muted">Recite nam ukratko što vam treba. Javit ćemo vam se u roku od dva radna dana s prijedlogom termina za razgovor.</p>
+      <p class="mt-6 text-muted">Za grupne prijave na javne edukacije ne trebate upit: prijavite više polaznika odjednom izravno na stranici događaja.</p>
+    </div>
+
+    <form method="post" action="/api/upit?vrsta=tvrtke" class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5 md:p-8">
+      <FormStatus success="Hvala! Zaprimili smo upit i javit ćemo vam se uskoro." />
+      <div class="grid gap-5 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Ime i prezime *</span>
+          <input class="field" name="ime" required maxlength="120" autocomplete="name" />
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Poslovna e-pošta *</span>
+          <input class="field" type="email" name="email" required maxlength="254" autocomplete="email" />
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Tvrtka / organizacija *</span>
+          <input class="field" name="tvrtka" required maxlength="160" autocomplete="organization" />
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Telefon</span>
+          <input class="field" type="tel" name="telefon" maxlength="40" autocomplete="tel" />
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Područje</span>
+          <select class="field" name="akademija" id="akademija">
+            <option value="">Nisam siguran/na</option>
+            {academies.map((a) => <option value={a.slug}>{a.name}</option>)}
+          </select>
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Broj polaznika</span>
+          <select class="field" name="velicina">
+            <option value="">Odaberite</option>
+            <option>do 10</option>
+            <option>10–25</option>
+            <option>25–50</option>
+            <option>više od 50</option>
+          </select>
+        </label>
+        <label class="block sm:col-span-2">
+          <span class="mb-1.5 block font-medium">Što biste željeli postići? *</span>
+          <textarea class="field min-h-36" name="poruka" required maxlength="4000"></textarea>
+        </label>
+      </div>
+      <div class="absolute -left-[9999px]" aria-hidden="true">
+        <label>Web stranica <input name="web" tabindex="-1" autocomplete="off" /></label>
+      </div>
+      <label class="mt-6 flex gap-3">
+        <input type="checkbox" name="privatnost" value="da" required class="mt-1 size-5 accent-teal" />
+        <span>Pročitao/la sam <a href="/privatnost" class="text-teal underline">obavijest o zaštiti privatnosti</a>. *</span>
+      </label>
+      <label class="mt-3 flex gap-3">
+        <input type="checkbox" name="obavijesti" value="da" class="mt-1 size-5 accent-teal" />
+        <span>Želim primati obavijesti o novim edukacijama (možete se odjaviti u svakom trenutku).</span>
+      </label>
+      <button class="btn btn-primary mt-8 w-full sm:w-auto">Pošalji upit</button>
+    </form>
+  </section>
+  <script is:inline>
+    (() => {
+      const a = new URLSearchParams(location.search).get("akademija");
+      const sel = document.getElementById("akademija");
+      if (a && sel) sel.value = a;
+    })();
+  </script>
+</Base>

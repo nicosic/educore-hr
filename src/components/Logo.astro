@@ -1,0 +1,5 @@
+---
+type Props = { class?: string };
+const { class: cls = "" } = Astro.props;
+---
+<span class:list={["font-extrabold tracking-tight text-teal", cls]}>edu<span class="tracking-tight">CORE</span>.</span>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /moj-racun
+
+Sitemap: https://educore.hr/sitemap-index.xml

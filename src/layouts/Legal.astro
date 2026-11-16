@@ -1,0 +1,17 @@
+---
+import Base from "@/layouts/Base.astro";
+type Props = { title: string; description: string; updated: string };
+const { title, description, updated } = Astro.props;
+---
+<Base title={title} description={description}>
+  <article class="container-page max-w-3xl pt-14 md:pt-20">
+    <p class="eyebrow">Pravno</p>
+    <h1 class="mt-3 text-4xl md:text-5xl">{title}</h1>
+    <p class="mt-4 text-muted">Posljednja izmjena: {updated}</p>
+    <div class="mt-8 rounded-2xl bg-butter p-5 text-sm leading-relaxed">
+      <strong>Nacrt.</strong> Tekst je radni predložak i prije objave ga mora pregledati pravni savjetnik. Podaci u uglatim zagradama
+      popunjavaju se nakon osnivanja tvrtke.
+    </div>
+    <div class="prose-legal mt-6"><slot /></div>
+  </article>
+</Base>

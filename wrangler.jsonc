@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "educore-local",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "observability": { "enabled": true },
+  "vars": {
+    "APP_ENV": "local",
+    "APP_URL": "http://localhost:4321",
+    "EMAIL_FROM": "info@educore.hr",
+    "EMAIL_FROM_NAME": "eduCORE",
+    "INQUIRY_TO": "info@educore.hr",
+    "EMAIL_TRANSPORT": "log"
+  }
+  // D1, R2, KV, cron i okruženja (preview/production) dodaju se u fazi 1, vidi docs/PLAN.md.
+}

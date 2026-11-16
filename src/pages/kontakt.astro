@@ -1,0 +1,49 @@
+---
+import Base from "@/layouts/Base.astro";
+import FormStatus from "@/components/FormStatus.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import { site } from "@/data/site";
+---
+<Base title="Kontakt" description="Javite nam se s pitanjem o edukacijama, prijavama, suradnji ili predavanju na eduCORE platformi.">
+  <section class="container-page grid gap-12 pt-14 md:pt-20 lg:grid-cols-[1fr_1.3fr]">
+    <div>
+      <SectionHeading as="h1" eyebrow="Kontakt" title="Razgovarajmo" lead="Pitanje o edukaciji, prijavi ili računu? Želite predavati ili surađivati? Pišite nam." />
+      <dl class="mt-10 space-y-6 text-lg">
+        <div>
+          <dt class="text-sm font-semibold uppercase tracking-wider text-muted">E-pošta</dt>
+          <dd class="mt-1"><a href={`mailto:${site.email}`} class="font-semibold text-teal underline-offset-4 hover:underline">{site.email}</a></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-semibold uppercase tracking-wider text-muted">Za tvrtke</dt>
+          <dd class="mt-1"><a href="/za-tvrtke" class="font-semibold text-teal underline-offset-4 hover:underline">Upit za zatvoreni program</a></dd>
+        </div>
+      </dl>
+    </div>
+
+    <form id="forma" method="post" action="/api/upit?vrsta=kontakt" class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5 md:p-8">
+      <FormStatus success="Hvala! Zaprimili smo poruku i javit ćemo vam se uskoro." />
+      <div class="grid gap-5 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block font-medium">Ime i prezime *</span>
+          <input class="field" name="ime" required maxlength="120" autocomplete="name" />
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-medium">E-pošta *</span>
+          <input class="field" type="email" name="email" required maxlength="254" autocomplete="email" />
+        </label>
+        <label class="block sm:col-span-2">
+          <span class="mb-1.5 block font-medium">Poruka *</span>
+          <textarea class="field min-h-40" name="poruka" required maxlength="4000"></textarea>
+        </label>
+      </div>
+      <div class="absolute -left-[9999px]" aria-hidden="true">
+        <label>Web stranica <input name="web" tabindex="-1" autocomplete="off" /></label>
+      </div>
+      <label class="mt-6 flex gap-3">
+        <input type="checkbox" name="privatnost" value="da" required class="mt-1 size-5 accent-teal" />
+        <span>Pročitao/la sam <a href="/privatnost" class="text-teal underline">obavijest o zaštiti privatnosti</a>. *</span>
+      </label>
+      <button class="btn btn-primary mt-8 w-full sm:w-auto">Pošalji poruku</button>
+    </form>
+  </section>
+</Base>
