@@ -143,3 +143,21 @@ export async function purgeExpiredAuth(db: Db, now: number) {
     db.delete(sessions).where(lt(sessions.expiresAt, now)),
   ]);
 }
+
+/**
+ * Pristupni kod za preview (dok nema e-pošte): uz ispravan kod admin dobiva poveznicu na ekranu.
+ * Radi isključivo kad je APP_ENV "preview", kod je postavljen (najmanje 16 znakova) i adresa je u ADMIN_EMAILS.
+ * Usporedba ide preko SHA-256 sažetaka, pa ne ovisi o tome koliko se znakova poklapa.
+ */
+export async function previewCodeAllows(
+  opts: { appEnv: string; configuredCode: string | undefined; givenCode: string; email: string; adminEmails: Set<string> },
+): Promise<boolean> {
+  if (opts.appEnv !== "preview") return false;
+  const configured = opts.configuredCode?.trim() ?? "";
+  if (configured.length < 16 || !opts.givenCode) return false;
+  if (!opts.adminEmails.has(normalizeEmail(opts.email))) return false;
+  const [a, b] = await Promise.all([sha256Hex(configured), sha256Hex(opts.givenCode.trim())]);
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}

@@ -3,13 +3,18 @@ import { env } from "cloudflare:workers";
 import Base from "@/layouts/Base.astro";
 import { sendEmail, type MailEnv } from "@/lib/email";
 import { isEmail } from "@/lib/forms";
-import { issueLoginToken, LOGIN_TOKEN_MS, parseAdminEmails, safeNextPath } from "@/server/auth";
+import { issueLoginToken, LOGIN_TOKEN_MS, parseAdminEmails, previewCodeAllows, safeNextPath } from "@/server/auth";
 
 export const prerender = false;
 
 const next = safeNextPath(Astro.url.searchParams.get("next"));
-let state: "form" | "sent" | "invalid" | "limited" = "form";
+let state: "form" | "sent" | "invalid" | "limited" | "badcode" | "direct" = "form";
 let email = "";
+let directLink = "";
+const appEnv = env.APP_ENV as string;
+const secretEnv = env as unknown as { PREVIEW_ACCESS_CODE?: string };
+// Polje za pristupni kod postoji samo na previewu, i to samo kad je kod postavljen.
+const codeEnabled = appEnv === "preview" && (secretEnv.PREVIEW_ACCESS_CODE?.trim().length ?? 0) >= 16;
 
 if (Astro.locals.user && Astro.request.method === "GET") {
   return Astro.redirect(next);
@@ -18,15 +23,37 @@ if (Astro.locals.user && Astro.request.method === "GET") {
 if (Astro.request.method === "POST") {
   const form = await Astro.request.formData();
   email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 254);
+  const givenCode = codeEnabled ? String(form.get("kod") ?? "").slice(0, 200) : "";
+  const adminEmails = parseAdminEmails(env.ADMIN_EMAILS);
   if (!isEmail(email)) {
     state = "invalid";
+  } else if (givenCode) {
+    // Ograničenje po IP-u i po adresi, da se kod ne može pogađati.
+    const ip = Astro.request.headers.get("cf-connecting-ip") ?? "?";
+    const [byIp, byEmail] = await Promise.all([
+      env.RL_MAGIC_LINK.limit({ key: `kod:${ip}` }),
+      env.RL_MAGIC_LINK.limit({ key: `kod:${email}` }),
+    ]);
+    if (!byIp.success || !byEmail.success) {
+      state = "limited";
+    } else if (await previewCodeAllows({ appEnv, configuredCode: secretEnv.PREVIEW_ACCESS_CODE, givenCode, email, adminEmails })) {
+      const token = await issueLoginToken(Astro.locals.db, email, { adminEmails, nextPath: next, now: Date.now() });
+      if (token) {
+        directLink = `/prijava/potvrda?t=${encodeURIComponent(token)}`;
+        state = "direct";
+      } else {
+        state = "badcode";
+      }
+    } else {
+      state = "badcode";
+    }
   } else {
     const { success } = await env.RL_MAGIC_LINK.limit({ key: email });
     if (!success) {
       state = "limited";
     } else {
       const token = await issueLoginToken(Astro.locals.db, email, {
-        adminEmails: parseAdminEmails(env.ADMIN_EMAILS),
+        adminEmails,
         nextPath: next,
         now: Date.now(),
       });
@@ -51,7 +78,14 @@ if (Astro.request.method === "POST") {
 <Base title="Prijava" noindex>
   <section class="container-page max-w-xl py-16 md:py-24">
     {
-      state === "sent" ? (
+      state === "direct" ? (
+        <div class="rounded-[var(--radius-card)] bg-mint p-8 md:p-10">
+          <p class="eyebrow">Preview</p>
+          <h1 class="mt-3 text-3xl">Kod je ispravan</h1>
+          <p class="mt-4 text-lg">Poveznica za <strong>{email}</strong> vrijedi 15 minuta i može se iskoristiti jednom.</p>
+          <a href={directLink} class="btn btn-primary mt-8">Nastavi na prijavu</a>
+        </div>
+      ) : state === "sent" ? (
         <div class="rounded-[var(--radius-card)] bg-mint p-8 md:p-10">
           <h1 class="text-3xl">Provjerite e-poštu</h1>
           <p class="mt-4 text-lg">
@@ -67,13 +101,21 @@ if (Astro.request.method === "POST") {
             Upišite e-adresu s kojom ste se prijavili na edukaciju. Poslat ćemo vam poveznicu za prijavu, bez lozinke.
           </p>
           {state === "invalid" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Upišite ispravnu e-adresu.</p>}
+          {state === "badcode" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Pristupni kod nije ispravan ili adresa nema administratorska prava.</p>}
           {state === "limited" && <p role="alert" class="mt-6 rounded-xl bg-pink p-4 font-medium">Previše pokušaja. Pričekajte minutu pa pokušajte ponovno.</p>}
           <form method="post" class="mt-8">
             <label class="block">
               <span class="mb-1.5 block font-medium">E-pošta</span>
               <input class="field" type="email" name="email" value={email} required maxlength="254" autocomplete="email" autofocus />
             </label>
-            <button class="btn btn-primary mt-6 w-full">Pošalji poveznicu</button>
+            {codeEnabled && (
+              <label class="mt-5 block">
+                <span class="mb-1.5 block font-medium">Pristupni kod <span class="font-normal text-muted">(samo preview, za administratore)</span></span>
+                <input class="field" type="password" name="kod" maxlength="200" autocomplete="off" />
+                <span class="mt-1 block text-sm text-muted">Bez koda poveznica se šalje e-poštom.</span>
+              </label>
+            )}
+            <button class="btn btn-primary mt-6 w-full">{codeEnabled ? "Nastavi" : "Pošalji poveznicu"}</button>
           </form>
         </div>
       )

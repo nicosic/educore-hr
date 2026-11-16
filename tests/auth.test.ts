@@ -54,3 +54,19 @@ describe("magic link", () => {
     void users;
   });
 });
+
+import { previewCodeAllows } from "@/server/auth";
+describe("pristupni kod za preview", () => {
+  const base = { appEnv: "preview", configuredCode: "tajni-kod-od-barem-16", givenCode: "tajni-kod-od-barem-16", email: "Admin@educore.test", adminEmails: admins };
+  it("propušta samo ispravan kod za admina na previewu", async () => {
+    expect(await previewCodeAllows(base)).toBe(true);
+    expect(await previewCodeAllows({ ...base, givenCode: "krivi-kod-od-barem-16" })).toBe(false);
+    expect(await previewCodeAllows({ ...base, email: "netko@example.com" })).toBe(false);
+  });
+  it("nikad u produkciji ni lokalno, ni s prekratkim kodom", async () => {
+    expect(await previewCodeAllows({ ...base, appEnv: "production" })).toBe(false);
+    expect(await previewCodeAllows({ ...base, appEnv: "local" })).toBe(false);
+    expect(await previewCodeAllows({ ...base, configuredCode: "kratko", givenCode: "kratko" })).toBe(false);
+    expect(await previewCodeAllows({ ...base, configuredCode: undefined })).toBe(false);
+  });
+});
