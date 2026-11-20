@@ -6,7 +6,8 @@ import { nav, site } from "@/data/site";
 type Props = { title?: string; description?: string; noindex?: boolean };
 const { title, description = site.description, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} | meet.hr` : `meet.hr | ${site.tagline}`;
-const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+// Pri buildu (format "file") putanja završava na .html; kanonska adresa je bez toga.
+const path = Astro.url.pathname.replace(/(\/index)?\.html$/, "").replace(/\/$/, "") || "/";
 const canonical = new URL(path, site.url).toString();
 const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 // Cloudflare Web Analytics (bez kolačića). Token se postavlja pri buildu.

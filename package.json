@@ -15,7 +15,9 @@
     "seed:local": "wrangler d1 execute DB --local --file scripts/seed-local.sql",
     "db:reset:local": "rm -rf .wrangler/state/v3/d1 && npm run db:migrate:local && npm run seed:local",
     "db:migrate:preview": "bash scripts/cf.sh npx wrangler d1 migrations apply DB -c wrangler.jsonc --env preview --remote",
-    "deploy:preview": "CLOUDFLARE_ENV=preview PUBLIC_NOINDEX=1 astro build && bash scripts/cf.sh npx wrangler deploy"
+    "deploy:preview": "CLOUDFLARE_ENV=preview PUBLIC_NOINDEX=1 astro build && bash scripts/cf.sh npx wrangler deploy",
+    "db:migrate:production": "bash scripts/cf.sh npx wrangler d1 migrations apply DB -c wrangler.jsonc --env production --remote",
+    "deploy:production": "CLOUDFLARE_ENV=production astro build && bash scripts/cf.sh npx wrangler deploy"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.8",

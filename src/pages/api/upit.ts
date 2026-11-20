@@ -1,10 +1,13 @@
 /**
- * Upiti s forme „Za tvrtke” i „Kontakt”. Upit ide mailom na INQUIRY_TO, a pošiljatelj dobiva potvrdu.
- * U fazi 1 upiti se spremaju i u tablicu `inquiries`.
+ * Upiti s forme „Za tvrtke” i „Kontakt”. Upit se najprije sprema u tablicu `inquiries` (da se ne izgubi ni kad
+ * e-pošta zakaže), zatim ide mailom na INQUIRY_TO, a pošiljatelj dobiva potvrdu.
  */
 import type { APIRoute } from "astro";
 import { env } from "cloudflare:workers";
+import { ulid } from "ulid";
 import { academies } from "@/data/academies";
+import { createDb } from "@/lib/db";
+import { inquiries } from "@/lib/db/schema";
 import { sendEmail, subscribe, type MailEnv } from "@/lib/email";
 import { backTo, isEmail, sameOrigin, str } from "@/lib/forms";
 
@@ -35,6 +38,22 @@ export const POST: APIRoute = async ({ request }) => {
     return backTo(request, fallback, "greska");
   }
 
+  const now = Date.now();
+  await createDb(env.DB)
+    .insert(inquiries)
+    .values({
+      id: ulid(now),
+      kind,
+      name,
+      email,
+      company: company || null,
+      phone: phone || null,
+      size: size || null,
+      academy: academy || null,
+      message,
+      createdAt: now,
+    });
+
   const mailEnv = env as unknown as MailEnv & { INQUIRY_TO: string };
   const lines = [
     `Vrsta: ${kind === "tvrtke" ? "Upit za tvrtke" : "Kontakt"}`,
@@ -56,7 +75,8 @@ export const POST: APIRoute = async ({ request }) => {
     text: lines.join("\n"),
     tag: `upit-${kind}`,
   });
-  if (!ok) return backTo(request, fallback, "greska");
+  // Upit je spremljen; ako obavijest timu ne prođe, to ide u log, a pošiljatelj ipak dobiva potvrdu.
+  if (!ok) console.error(JSON.stringify({ event: "inquiry.notify_failed", kind }));
 
   await sendEmail(mailEnv, {
     to: { email, name },

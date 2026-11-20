@@ -10,7 +10,8 @@ export default defineConfig({
   output: "static",
   // Slike se optimiziraju pri buildu, pa nije potreban Cloudflare Images binding.
   adapter: cloudflare({ imageService: "compile" }),
-  integrations: [sitemap()],
+  // U sitemapu su samo javne stranice (bez admina, prijave i korisničkog računa).
+  integrations: [sitemap({ filter: (page) => !/\/(admin|prijava|moj-racun|odjava)(\/|$)/.test(new URL(page).pathname) })],
   trailingSlash: "never",
   build: { format: "file" },
   vite: { plugins: [tailwindcss()] },

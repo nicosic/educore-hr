@@ -1,6 +1,6 @@
-# eduCORE
+# meet.hr
 
-Prezentacijska stranica i platforma za prijave na online (Zoom) i offline edukacije (educore.hr).
+Prezentacijska stranica i platforma za prijave na online (Zoom) i offline edukacije (meet.hr). Repozitorij i nazivi resursa na Cloudflareu zadržali su radni naziv educore.
 Astro 7 na Cloudflare Workersima. Plan, faze i model podataka nalaze se u [docs/PLAN.md](docs/PLAN.md).
 
 ## Lokalni razvoj
@@ -30,6 +30,15 @@ npm run deploy:preview                    # build s CLOUDFLARE_ENV=preview i dep
 ```
 
 Tajne za preview: `bash scripts/cf.sh npx wrangler secret put ADMIN_EMAILS -c wrangler.jsonc --env preview` (i `BREVO_API_KEY`).
+
+## Produkcija (meet.hr)
+
+Koraci za objavu (domena, e-pošta, tajne, migracije, deploy) nalaze se u [docs/OBJAVA.md](docs/OBJAVA.md).
+
+```bash
+npm run db:migrate:production
+npm run deploy:production
+```
 
 ## Struktura
 
