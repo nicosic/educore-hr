@@ -1,117 +1,226 @@
 ---
 import Base from "@/layouts/Base.astro";
-import Card from "@/components/Card.astro";
-import Circles from "@/components/Circles.astro";
-import SectionHeading from "@/components/SectionHeading.astro";
-import { academies, overviewTones } from "@/data/academies";
+import { academies } from "@/data/academies";
 import { community, formats, outcomes, pillars } from "@/data/site";
 import { featuredEvent } from "@/data/events";
+import { photos } from "@/data/photos";
+
+const stats = [
+  { value: "6", label: "akademija" },
+  { value: "3", label: "formata: uživo, online, hibridno" },
+  { value: "1", label: "potvrda za svaku edukaciju" },
+  { value: "HR", label: "i regija" },
+];
+const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8 20h8M12 16v4", "M5 4v16l14-8z", "M3 21h18M5 21V7l7-4 7 4v14M9 10h1M14 10h1M9 14h1M14 14h1"];
 ---
 <Base>
   <!-- Hero -->
-  <section class="relative overflow-hidden">
-    <div class="container-page grid items-center gap-10 pb-20 pt-14 md:pt-20 lg:grid-cols-[1.2fr_1fr]">
-      <div>
-        <p class="inline-flex rounded-full bg-lilac px-4 py-2 text-xs font-bold tracking-[0.14em]">IDEJE • EDUKACIJE • ZAJEDNICA</p>
-        <h1 class="mt-8 text-5xl leading-[1.05] md:text-7xl">Znanje koje pokreće ljude i poslovanje.</h1>
-        <p class="mt-6 max-w-xl text-lg text-muted md:text-xl">
-          Regionalna platforma za edukacije, radionice i profesionalni razvoj. Učite od priznatih stručnjaka i primijenite znanje
-          već sutra.
-        </p>
-        <div class="mt-10 flex flex-wrap gap-3">
-          <a href="/dogadanja" class="btn btn-primary">Pogledaj događanja</a>
-          <a href="/akademije" class="btn btn-secondary">Upoznaj akademije</a>
-        </div>
+  <section class="container-page grid items-center gap-12 pb-16 pt-12 md:pt-20 lg:grid-cols-2 lg:gap-16">
+    <div>
+      <h1 class="h-display">Znanje koje <span class="mark">pokreće</span> ljude i poslovanje.</h1>
+      <p class="mt-6 max-w-lg text-lg">
+        Regionalna platforma za edukacije, radionice i profesionalni razvoj. Učite od priznatih stručnjaka i primijenite znanje već
+        sutra.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="/dogadanja" class="btn btn-primary">Pogledaj događanja</a>
+        <a href="/za-tvrtke" class="btn btn-secondary">Za tvrtke</a>
       </div>
-      <Circles class="mx-auto w-full max-w-md lg:max-w-none" />
     </div>
+    <div class="relative mx-auto w-full max-w-md lg:max-w-none">
+      <img
+        src={photos.hero.src}
+        alt={photos.hero.alt}
+        width="900"
+        height="1080"
+        class="aspect-[5/6] w-full rounded-[1.75rem] object-cover"
+        fetchpriority="high"
+      />
+      <div class="absolute -left-4 top-8 rounded-2xl bg-white p-4 pr-6 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.35)] sm:-left-8">
+        <p class="font-display text-3xl font-bold text-ink">6</p>
+        <p class="text-sm">akademija znanja</p>
+      </div>
+      <div class="absolute -right-3 bottom-8 flex items-center gap-4 rounded-2xl bg-white p-4 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.35)] sm:-right-6">
+        <div>
+          <p class="text-sm">Prvi masterclass</p>
+          <p class="font-display font-bold text-ink">Početak 2027.</p>
+        </div>
+        <span class="flex size-10 items-center justify-center rounded-full bg-sun text-ink" aria-hidden="true">→</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Brojke -->
+  <section class="bg-sage">
+    <dl class="container-page grid grid-cols-2 gap-y-8 py-10 lg:grid-cols-4">
+      {
+        stats.map((s, i) => (
+          <div class:list={["px-4 text-center", i % 2 === 1 && "border-l border-line", i > 1 && "lg:border-l"]}>
+            <dt class="sr-only">{s.label}</dt>
+            <dd class="font-display text-4xl font-bold text-ink md:text-5xl">{s.value}</dd>
+            <dd class="mt-1 text-sm">{s.label}</dd>
+          </div>
+        ))
+      }
+    </dl>
   </section>
 
   <!-- Naša ideja -->
-  <section class="container-page py-16">
-    <SectionHeading
-      eyebrow="Naša ideja"
-      title="Jedno mjesto. Mnogo novih mogućnosti."
-      lead="Edukacije koje spajaju znanje priznatih stručnjaka s izazovima svakodnevnog poslovanja."
-    />
-    <div class="mt-12 grid gap-5 md:grid-cols-3">
-      {pillars.map((p) => <Card title={p.title} tone={p.tone} size="lg"><p>{p.text}</p></Card>)}
+  <section class="container-page grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:items-center">
+    <div>
+      <h2 class="h-section">Jedno mjesto. <span class="mark">Mnogo</span> novih mogućnosti.</h2>
+      <p class="mt-6 max-w-md">Edukacije koje spajaju znanje priznatih stručnjaka s izazovima svakodnevnog poslovanja.</p>
+      <a href="/o-nama" class="btn btn-primary mt-8">Više o nama</a>
     </div>
+    <ul class="space-y-4">
+      {
+        pillars.map((p) => (
+          <li class="flex gap-4 rounded-[2rem] border-[1.5px] border-ink px-7 py-5">
+            <svg class="mt-1 size-6 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="11" fill="currentColor" class="text-ink" />
+              <path d="M7 12.5l3.2 3L17 9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div>
+              <p class="font-display text-xl font-bold text-ink">{p.title}</p>
+              <p class="mt-1 text-[0.95rem]">{p.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
   <!-- Prvi događaj -->
-  <section class="container-page py-16">
-    <SectionHeading eyebrow="Prvi događaj" title={featuredEvent.title} lead={featuredEvent.lead} />
-    <div class="mt-12 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
-      <div class="flex min-h-80 flex-col justify-between rounded-[var(--radius-card)] bg-pink p-8 md:p-10">
-        <div>
-          <p class="text-sm font-semibold uppercase tracking-wider text-ink/70">{featuredEvent.when}</p>
-          <h3 class="mt-4 text-3xl md:text-4xl">{featuredEvent.question}</h3>
-        </div>
-        <p class="mt-8 text-lg">{featuredEvent.tags.join(" • ")}</p>
+  <section class="bg-stone">
+    <div class="container-page grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:items-center">
+      <div>
+        <p class="eyebrow">{featuredEvent.when}</p>
+        <h2 class="h-section mt-4">Masterclass s <span class="mark">poznatim</span> psihijatrom</h2>
+        <p class="mt-6 max-w-md text-lg">{featuredEvent.question}</p>
+        <ul class="mt-8 grid max-w-md grid-cols-2 gap-x-6 gap-y-4">
+          {
+            featuredEvent.tags.map((t) => (
+              <li class="flex items-center gap-3 font-medium text-ink">
+                <span class="size-2.5 rounded-full bg-sun ring-4 ring-sun/30" aria-hidden="true" />
+                <span class="first-letter:uppercase">{t}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <a href="/dogadanja" class="btn btn-primary mt-10">Obavijesti me o prijavama</a>
       </div>
-      <div class="flex flex-col justify-between rounded-[var(--radius-card)] bg-mint p-8">
-        <div>
-          <h3 class="text-2xl">Doživljaj koji se pamti</h3>
-          <p class="mt-3 leading-relaxed">Predavanje uživo, moderirani razgovor, pitanja publike i dostupna snimka za sve polaznike.</p>
-        </div>
-        <a href="/dogadanja" class="btn btn-primary mt-8 self-start">Obavijesti me o prijavama</a>
-      </div>
+      <img src={photos.event.src} alt={photos.event.alt} width="1200" height="820" loading="lazy" class="aspect-[3/2] w-full rounded-[1.75rem] object-cover" />
     </div>
   </section>
 
   <!-- Akademije -->
-  <section class="container-page py-16">
-    <SectionHeading eyebrow="Šest akademija" title="eduCORE ekosustav" lead="Šest povezanih područja za ljude, timove i organizacije." />
-    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <section class="container-page py-20 md:py-28">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="h-section">Šest akademija, <span class="mark">jedan</span> ekosustav</h2>
+      <p class="mt-5">Šest povezanih područja za ljude, timove i organizacije.</p>
+    </div>
+    <div class="mt-16 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
       {
         academies.map((a, i) => (
-          <Card title={a.name} tone={overviewTones[i]} href={`/akademije/${a.slug}`}>
-            <p>{a.short}</p>
-          </Card>
+          <a href={`/akademije/${a.slug}`} class="group relative block pt-8">
+            <span class="pointer-events-none absolute left-0 top-0 font-display text-6xl font-bold text-ink/[0.07]" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <h3 class="relative text-2xl">{a.name}</h3>
+            <p class="relative mt-3">{a.short}</p>
+            <p class="relative mt-5 font-semibold text-ink">
+              Saznaj više <span aria-hidden="true" class="inline-block transition-transform group-hover:translate-x-1">→</span>
+            </p>
+          </a>
         ))
       }
     </div>
   </section>
 
   <!-- Načini učenja -->
-  <section class="container-page py-16">
-    <SectionHeading eyebrow="Načini učenja" title="Edukacija po mjeri polaznika" lead="Različiti formati, jedna dosljedna kvaliteta iskustva." />
-    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {formats.map((f) => <Card title={f.title} tone={f.tone}><p>{f.text}</p></Card>)}
+  <section class="bg-night text-white/70">
+    <div class="container-page py-20 md:py-28">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="h-section !text-white">Učite na način koji vam <span class="mark mark-dark">odgovara</span>.</h2>
+        <p class="mt-5">Različiti formati, jedna dosljedna kvaliteta iskustva.</p>
+      </div>
+      <div class="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          formats.map((f, i) => (
+            <div class="rounded-[var(--radius-card)] bg-night-card p-8">
+              <svg class="size-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d={formatIcons[i]} />
+              </svg>
+              <h3 class="mt-6 text-xl !text-white">{f.title}</h3>
+              <p class="mt-3">{f.text}</p>
+            </div>
+          ))
+        }
+        <div class="flex flex-col justify-between gap-8 rounded-[var(--radius-card)] bg-sun p-8 text-ink md:col-span-2 md:flex-row md:items-center md:p-10">
+          <p class="max-w-md font-display text-3xl font-bold leading-tight md:text-4xl">Trebate edukaciju za cijeli tim?</p>
+          <a href="/za-tvrtke" class="btn btn-primary shrink-0 self-start md:self-center">Javite nam se</a>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Potvrde i alati -->
-  <section class="container-page py-16">
-    <SectionHeading
-      eyebrow="Potvrde i praktični alati"
-      title="Znanje koje se može pokazati"
-      lead="Edukacije završavaju potvrdom o sudjelovanju i konkretnim radnim materijalima."
-    />
-    <div class="mt-12 grid gap-5 md:grid-cols-3">
-      {outcomes.map((o) => <Card title={o.title} tone={o.tone}><p>{o.text}</p></Card>)}
+  <section class="container-page grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:items-center">
+    <div>
+      <h2 class="h-section">Znanje koje se <span class="mark">može</span> pokazati</h2>
+      <p class="mt-6 max-w-md">Edukacije završavaju potvrdom o sudjelovanju i konkretnim radnim materijalima.</p>
+      <p class="mt-4 text-sm">Službeni ispiti i certifikati ovise o odobrenjima partnerskih tijela.</p>
     </div>
-    <p class="mt-6 text-sm text-muted">Službeni ispiti i certifikati ovise o odobrenjima partnerskih tijela.</p>
+    <ul class="divide-y divide-line border-y border-line">
+      {
+        outcomes.map((o) => (
+          <li class="flex gap-5 py-6">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-sun font-display font-bold text-ink" aria-hidden="true">
+              ✓
+            </span>
+            <div>
+              <p class="font-display text-xl font-bold text-ink">{o.title}</p>
+              <p class="mt-1">{o.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
   <!-- Zajednica -->
-  <section class="container-page py-16">
-    <SectionHeading eyebrow="Zajednica i regija" title="Od edukacije do zajednice znanja" lead="Platforma koja povezuje stručnjake i polaznike u Hrvatskoj i regiji." />
-    <div class="mt-12 grid gap-5 md:grid-cols-3">
-      {community.map((c) => <Card title={c.title} tone={c.tone}><p>{c.text}</p></Card>)}
+  <section class="bg-stone">
+    <div class="container-page py-20 md:py-28">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="h-section">Od edukacije do <span class="mark">zajednice</span> znanja</h2>
+        <p class="mt-5">Platforma koja povezuje stručnjake i polaznike u Hrvatskoj i regiji.</p>
+      </div>
+      <div class="mt-14 grid gap-5 md:grid-cols-3">
+        {
+          community.map((c) => (
+            <div class="rounded-[var(--radius-card)] bg-white p-8">
+              <h3 class="text-xl">{c.title}</h3>
+              <p class="mt-3">{c.text}</p>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </section>
 
   <!-- CTA -->
-  <section class="container-page pt-16">
-    <div class="rounded-[2rem] bg-mint px-8 py-14 md:px-14 md:py-20">
-      <p class="text-4xl font-extrabold tracking-tight text-teal md:text-5xl">eduCORE.</p>
-      <h2 class="mt-6 text-4xl md:text-6xl">Uči. Primijeni. Rasti.</h2>
-      <p class="mt-5 max-w-xl text-lg">Trebate edukaciju za cijeli tim? Pripremamo zatvorene programe prilagođene vašoj organizaciji.</p>
-      <div class="mt-10 flex flex-wrap gap-3">
-        <a href="/za-tvrtke" class="btn btn-primary">Program za tvrtke</a>
-        <a href="/dogadanja" class="btn bg-white text-ink hover:bg-cream">Nadolazeća događanja</a>
+  <section class="container-page pt-20 md:pt-28">
+    <div class="relative overflow-hidden rounded-[1.75rem] bg-night">
+      <img src={photos.cta.src} alt="" width="1600" height="760" loading="lazy" class="absolute inset-0 size-full object-cover opacity-35" />
+      <div class="relative px-8 py-16 md:px-16 md:py-24">
+        <h2 class="h-display max-w-2xl !text-white">Uči. Primijeni. <span class="mark mark-dark">Rasti.</span></h2>
+        <p class="mt-6 max-w-lg text-lg text-white/80">
+          Prijavite se na nadolazeća događanja ili nam javite kakvu edukaciju trebate za svoj tim.
+        </p>
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href="/dogadanja" class="btn bg-white text-ink hover:bg-sun">Nadolazeća događanja</a>
+          <a href="/kontakt" class="btn border-[1.5px] border-white text-white hover:bg-white hover:text-ink">Kontakt</a>
+        </div>
       </div>
     </div>
   </section>

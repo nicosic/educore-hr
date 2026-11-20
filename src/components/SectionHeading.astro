@@ -4,6 +4,6 @@ const { eyebrow, title, lead, as: H = "h2" } = Astro.props;
 ---
 <div class="max-w-3xl">
   {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-  <H class:list={["mt-3", H === "h1" ? "text-4xl md:text-6xl" : "text-3xl md:text-5xl"]}>{title}</H>
+  <H class:list={["mt-3", H === "h1" ? "h-display" : "h-section"]}>{title}</H>
   {lead && <p class="mt-5 text-lg text-muted md:text-xl">{lead}</p>}
 </div>

@@ -22,7 +22,7 @@ const year = new Date().getFullYear();
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#fff8f0" />
+    <meta name="theme-color" content="#fdfdfd" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="hr_HR" />
     <meta property="og:site_name" content="eduCORE" />
@@ -46,19 +46,19 @@ const year = new Date().getFullYear();
       Preskoči na sadržaj
     </a>
 
-    <header class="sticky top-0 z-40 border-b border-ink/5 bg-cream/90 backdrop-blur">
+    <header class="sticky top-0 z-40 border-b border-line/70 bg-cream/90 backdrop-blur">
       <div class="container-page flex h-18 items-center justify-between gap-6">
         <a href="/" class="text-2xl" aria-label="eduCORE, početna"><Logo /></a>
 
         <nav aria-label="Glavna navigacija" class="hidden lg:block">
-          <ul class="flex items-center gap-8 font-medium">
+          <ul class="flex items-center gap-9 text-[0.95rem] font-medium text-ink">
             {
               nav.map((n) => (
                 <li>
                   <a
                     href={n.href}
                     aria-current={isActive(n.href) ? "page" : undefined}
-                    class:list={["transition-colors hover:text-teal", isActive(n.href) && "text-teal"]}
+                    class:list={["underline-offset-8 transition hover:underline", isActive(n.href) && "underline decoration-sun decoration-[3px]"]}
                   >
                     {n.label}
                   </a>
@@ -69,7 +69,7 @@ const year = new Date().getFullYear();
         </nav>
 
         <div class="flex items-center gap-3">
-          <a href="/dogadanja" class="btn btn-primary hidden !py-2.5 sm:inline-flex">Prijavi se</a>
+          <a href="/dogadanja" class="btn btn-secondary hidden !py-2.5 sm:inline-flex">Prijavi se</a>
           <details class="relative lg:hidden">
             <summary class="flex size-11 cursor-pointer list-none items-center justify-center rounded-full border border-ink/15 [&::-webkit-details-marker]:hidden" aria-label="Izbornik">
               <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
@@ -97,30 +97,30 @@ const year = new Date().getFullYear();
       <slot />
     </main>
 
-    <footer class="mt-24 bg-ink text-cream">
+    <footer class="mt-24 bg-stone text-muted">
       <div class="container-page grid gap-10 py-16 md:grid-cols-4">
         <div class="md:col-span-2">
-          <a href="/" class="text-3xl"><Logo class="!text-mint" /></a>
-          <p class="mt-4 max-w-sm text-cream/80">Uči. Primijeni. Rasti. Nova generacija poslovnih edukacija za Hrvatsku i regiju.</p>
-          <p class="mt-6"><a href={`mailto:${site.email}`} class="font-semibold underline-offset-4 hover:underline">{site.email}</a></p>
+          <a href="/" class="text-3xl"><Logo /></a>
+          <p class="mt-4 max-w-sm">Uči. Primijeni. Rasti. Nova generacija poslovnih edukacija za Hrvatsku i regiju.</p>
+          <p class="mt-6"><a href={`mailto:${site.email}`} class="font-semibold text-ink underline-offset-4 hover:underline">{site.email}</a></p>
         </div>
         <div>
-          <p class="font-semibold">Platforma</p>
-          <ul class="mt-4 space-y-2 text-cream/80">
-            {nav.map((n) => <li><a href={n.href} class="hover:text-white">{n.label}</a></li>)}
+          <p class="font-display text-lg font-bold text-ink">Platforma</p>
+          <ul class="mt-4 space-y-2">
+            {nav.map((n) => <li><a href={n.href} class="hover:text-ink">{n.label}</a></li>)}
           </ul>
         </div>
         <div>
-          <p class="font-semibold">Pravno</p>
-          <ul class="mt-4 space-y-2 text-cream/80">
-            <li><a href="/privatnost" class="hover:text-white">Zaštita privatnosti</a></li>
-            <li><a href="/uvjeti" class="hover:text-white">Uvjeti korištenja</a></li>
-            <li><a href="/kolacici" class="hover:text-white">Kolačići</a></li>
+          <p class="font-display text-lg font-bold text-ink">Pravno</p>
+          <ul class="mt-4 space-y-2">
+            <li><a href="/privatnost" class="hover:text-ink">Zaštita privatnosti</a></li>
+            <li><a href="/uvjeti" class="hover:text-ink">Uvjeti korištenja</a></li>
+            <li><a href="/kolacici" class="hover:text-ink">Kolačići</a></li>
           </ul>
         </div>
       </div>
-      <div class="border-t border-cream/10">
-        <div class="container-page flex flex-col gap-2 py-6 text-sm text-cream/60 sm:flex-row sm:justify-between">
+      <div class="border-t border-line">
+        <div class="container-page flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:justify-between">
           <p>© {year} eduCORE</p>
           <p>Hrvatska • Regija • Online</p>
         </div>

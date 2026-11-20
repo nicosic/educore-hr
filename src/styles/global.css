@@ -1,25 +1,36 @@
 @import "tailwindcss";
-@import "@fontsource-variable/public-sans";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/merriweather-sans";
 
 /*
- * Dizajn sustav prema konceptu (EduCore_Koncept_Edukacije_Svjeze_Boje.pdf):
- * krem podloga, teal logotip, tamnoplavi tekst, ljubičaste oznake i pastelne kartice.
+ * Prijedlog stila "konzultantski": bijela podloga, gotovo crni tekst, snažni sans naslovi (Merriweather Sans),
+ * žuti marker preko ključnih riječi, crni "pill" gumbi i tamna sekcija s karticama.
+ * Stari nazivi tokena (cream, ink, teal...) zadržani su da se ostale stranice ne moraju mijenjati.
  */
 @theme {
-  --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Merriweather Sans Variable", "Inter Variable", ui-sans-serif, sans-serif;
 
-  --color-cream: #fff8f0;
-  --color-ink: #22314a;
-  --color-muted: #66748a;
-  --color-teal: #1a7f78;
-  --color-teal-dark: #13625c;
-  --color-violet: #7356bf;
+  --color-cream: #fdfdfd;
+  --color-ink: #0c1100;
+  --color-muted: #55574f;
+  --color-teal: #0c1100;
+  --color-teal-dark: #2b2f24;
+  --color-violet: #0c1100;
 
-  --color-pink: #ffd9e6;
-  --color-mint: #c6f2dd;
-  --color-butter: #ffe4a0;
-  --color-sky: #d7ebff;
-  --color-lilac: #e7ddff;
+  --color-stone: #f5f3f2;
+  --color-sage: #eff3ed;
+  --color-night: #070900;
+  --color-night-card: #1b1c18;
+  --color-sun: #f2e27a;
+  --color-line: #e3e2dc;
+
+  /* Tonovi akademija postaju neutralni, uz jedan topli žuti. */
+  --color-pink: #f5f3f2;
+  --color-mint: #eff3ed;
+  --color-butter: #f8f1cf;
+  --color-sky: #eef1f3;
+  --color-lilac: #f2f1f4;
 
   --radius-card: 1.25rem;
 }
@@ -39,11 +50,20 @@
     flex-direction: column;
   }
 
+  body {
+    color: var(--color-muted);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
   h1,
   h2,
   h3 {
+    font-family: var(--font-display);
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--color-ink);
     text-wrap: balance;
   }
 
@@ -74,8 +94,8 @@
 
   .eyebrow {
     font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-violet);
   }
@@ -86,7 +106,7 @@
     justify-content: center;
     gap: 0.5rem;
     border-radius: 999px;
-    padding: 0.8rem 1.5rem;
+    padding: 0.85rem 1.6rem;
     font-weight: 600;
     line-height: 1.2;
     transition:
@@ -96,7 +116,7 @@
   }
 
   .btn-primary {
-    background: var(--color-teal);
+    background: var(--color-ink);
     color: #fff;
   }
 
@@ -107,6 +127,7 @@
   .btn-secondary {
     border: 1.5px solid var(--color-ink);
     color: var(--color-ink);
+    background: transparent;
   }
 
   .btn-secondary:hover {
@@ -118,7 +139,7 @@
     display: block;
     width: 100%;
     border-radius: 0.75rem;
-    border: 1.5px solid #d9d2c7;
+    border: 1.5px solid var(--color-line);
     background: #fff;
     padding: 0.75rem 1rem;
     font-size: 1rem;
@@ -128,6 +149,28 @@
     border-color: var(--color-teal);
     outline: none;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-teal) 25%, transparent);
+  }
+
+  /* Žuti marker preko ključne riječi u naslovu. */
+  .mark {
+    background-image: linear-gradient(transparent 55%, var(--color-sun) 55%, var(--color-sun) 90%, transparent 90%);
+    padding-inline: 0.08em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .mark-dark {
+    background-image: linear-gradient(transparent 62%, color-mix(in srgb, var(--color-sun) 55%, transparent) 62%, color-mix(in srgb, var(--color-sun) 55%, transparent) 92%, transparent 92%);
+  }
+
+  .h-display {
+    font-size: clamp(2.5rem, 5.2vw, 4rem);
+    line-height: 1.08;
+  }
+
+  .h-section {
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    line-height: 1.12;
   }
 
   .prose-legal h2 {
