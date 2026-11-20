@@ -18,19 +18,22 @@
   --color-teal-dark: #2b2f24;
   --color-violet: #0c1100;
 
-  --color-stone: #f5f3f2;
-  --color-sage: #eff3ed;
-  --color-night: #070900;
-  --color-night-card: #1b1c18;
-  --color-sun: #f2e27a;
-  --color-line: #e3e2dc;
+  /* Neonski naglasci: limeta kao glavni, ružičasta za sitne detalje. */
+  --color-neon: #d7ff3a;
+  --color-neon-pink: #ff4fd1;
+  --color-neon-soft: #f1fcd2;
 
-  /* Tonovi akademija postaju neutralni, uz jedan topli žuti. */
-  --color-pink: #f5f3f2;
-  --color-mint: #eff3ed;
-  --color-butter: #f8f1cf;
-  --color-sky: #eef1f3;
-  --color-lilac: #f2f1f4;
+  --color-stone: #f3f4f0;
+  --color-night: #0b0d07;
+  --color-night-card: #1a1d14;
+  --color-line: #e2e4dc;
+
+  /* Tonovi akademija: blage nijanse neonskih boja na bijeloj podlozi. */
+  --color-pink: #ffeaf9;
+  --color-mint: #eef4e9;
+  --color-butter: #f1fcd2;
+  --color-sky: #edf1f7;
+  --color-lilac: #f1edff;
 
   --radius-card: 1.25rem;
 }
@@ -72,7 +75,7 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-teal);
+    outline: 3px solid var(--color-neon-pink);
     outline-offset: 3px;
     border-radius: 0.375rem;
   }
@@ -153,14 +156,17 @@
 
   /* Žuti marker preko ključne riječi u naslovu. */
   .mark {
-    background-image: linear-gradient(transparent 55%, var(--color-sun) 55%, var(--color-sun) 90%, transparent 90%);
+    background-image: linear-gradient(transparent 52%, var(--color-neon) 52%, var(--color-neon) 92%, transparent 92%);
     padding-inline: 0.08em;
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
   }
 
+  /* Na tamnoj podlozi riječ sama svijetli neonski. */
   .mark-dark {
-    background-image: linear-gradient(transparent 62%, color-mix(in srgb, var(--color-sun) 55%, transparent) 62%, color-mix(in srgb, var(--color-sun) 55%, transparent) 92%, transparent 92%);
+    background-image: none;
+    color: var(--color-neon);
+    text-shadow: 0 0 24px color-mix(in srgb, var(--color-neon) 45%, transparent);
   }
 
   .h-display {

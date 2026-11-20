@@ -74,9 +74,9 @@ if (Astro.request.method === "POST") {
         const minutes = LOGIN_TOKEN_MS / 60_000;
         await sendEmail(env as unknown as MailEnv, {
           to: { email },
-          subject: "Vaša poveznica za prijavu na eduCORE",
-          text: `Pozdrav,\n\nza prijavu na eduCORE otvorite ovu poveznicu (vrijedi ${minutes} minuta i može se iskoristiti jednom):\n\n${link}\n\nAko niste zatražili prijavu, slobodno zanemarite ovu poruku.\n\neduCORE`,
-          html: `<p>Pozdrav,</p><p>za prijavu na eduCORE kliknite na gumb. Poveznica vrijedi ${minutes} minuta i može se iskoristiti jednom.</p><p><a href="${link}" style="display:inline-block;background:#1a7f78;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600">Prijavi se</a></p><p style="color:#66748a;font-size:13px">Ako niste zatražili prijavu, slobodno zanemarite ovu poruku.</p>`,
+          subject: "Vaša poveznica za prijavu na meet.hr",
+          text: `Pozdrav,\n\nza prijavu na meet.hr otvorite ovu poveznicu (vrijedi ${minutes} minuta i može se iskoristiti jednom):\n\n${link}\n\nAko niste zatražili prijavu, slobodno zanemarite ovu poruku.\n\nmeet.hr`,
+          html: `<p>Pozdrav,</p><p>za prijavu na meet.hr kliknite na gumb. Poveznica vrijedi ${minutes} minuta i može se iskoristiti jednom.</p><p><a href="${link}" style="display:inline-block;background:#0c1100;color:#d7ff3a;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600">Prijavi se</a></p><p style="color:#66748a;font-size:13px">Ako niste zatražili prijavu, slobodno zanemarite ovu poruku.</p>`,
           tag: "magic-link",
         });
         if (env.APP_ENV === "local") console.log(JSON.stringify({ msg: "dev.magic_link", link }));

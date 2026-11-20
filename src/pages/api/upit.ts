@@ -61,7 +61,7 @@ export const POST: APIRoute = async ({ request }) => {
   await sendEmail(mailEnv, {
     to: { email, name },
     subject: "Zaprimili smo vaš upit",
-    text: `Poštovani/a ${name},\n\nhvala na upitu. Javit ćemo vam se u roku od dva radna dana.\n\neduCORE\nhttps://educore.hr`,
+    text: `Poštovani/a ${name},\n\nhvala na upitu. Javit ćemo vam se u roku od dva radna dana.\n\nmeet.hr\nhttps://meet.hr`,
     tag: "upit-potvrda",
   });
   if (newsletter) await subscribe(mailEnv, email, { IME: name });

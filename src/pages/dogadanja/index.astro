@@ -16,7 +16,7 @@ const prices = await fromPrices(Astro.locals.db, list.map((e) => e.id), now);
 // Javni popis smije kratko u cache (CDN i preglednik).
 Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
 ---
-<Base title="Događanja" description="Nadolazeće edukacije, radionice i masterclassovi eduCORE platforme, uživo i online.">
+<Base title="Događanja" description="Nadolazeće edukacije, radionice i masterclassovi platforme meet.hr, uživo i online.">
   <section class="container-page pt-14 md:pt-20">
     <SectionHeading
       as="h1"
@@ -71,7 +71,7 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
         </div>
         <label class="mt-4 flex gap-3 text-sm">
           <input type="checkbox" name="privola" value="da" required class="mt-0.5 size-5 accent-teal" />
-          <span>Pristajem primati obavijesti o edukacijama eduCORE-a. <a href="/privatnost" class="underline">Zaštita privatnosti</a></span>
+          <span>Pristajem primati obavijesti o edukacijama platforme meet.hr. <a href="/privatnost" class="underline">Zaštita privatnosti</a></span>
         </label>
       </div>
     </form>

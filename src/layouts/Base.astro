@@ -5,7 +5,7 @@ import { nav, site } from "@/data/site";
 
 type Props = { title?: string; description?: string; noindex?: boolean };
 const { title, description = site.description, noindex = false } = Astro.props;
-const fullTitle = title ? `${title} | eduCORE` : `eduCORE | ${site.tagline}`;
+const fullTitle = title ? `${title} | meet.hr` : `meet.hr | ${site.tagline}`;
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const canonical = new URL(path, site.url).toString();
 const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
@@ -25,7 +25,7 @@ const year = new Date().getFullYear();
     <meta name="theme-color" content="#fdfdfd" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="hr_HR" />
-    <meta property="og:site_name" content="eduCORE" />
+    <meta property="og:site_name" content="meet.hr" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -48,7 +48,7 @@ const year = new Date().getFullYear();
 
     <header class="sticky top-0 z-40 border-b border-line/70 bg-cream/90 backdrop-blur">
       <div class="container-page flex h-18 items-center justify-between gap-6">
-        <a href="/" class="text-2xl" aria-label="eduCORE, početna"><Logo /></a>
+        <a href="/" class="text-2xl" aria-label="meet.hr, početna"><Logo /></a>
 
         <nav aria-label="Glavna navigacija" class="hidden lg:block">
           <ul class="flex items-center gap-9 text-[0.95rem] font-medium text-ink">
@@ -58,7 +58,7 @@ const year = new Date().getFullYear();
                   <a
                     href={n.href}
                     aria-current={isActive(n.href) ? "page" : undefined}
-                    class:list={["underline-offset-8 transition hover:underline", isActive(n.href) && "underline decoration-sun decoration-[3px]"]}
+                    class:list={["underline-offset-8 transition hover:underline", isActive(n.href) && "underline decoration-neon-pink decoration-[3px]"]}
                   >
                     {n.label}
                   </a>
@@ -97,31 +97,31 @@ const year = new Date().getFullYear();
       <slot />
     </main>
 
-    <footer class="mt-24 bg-stone text-muted">
+    <footer class="mt-24 bg-night text-white/65">
       <div class="container-page grid gap-10 py-16 md:grid-cols-4">
         <div class="md:col-span-2">
-          <a href="/" class="text-3xl"><Logo /></a>
+          <a href="/" class="text-3xl"><Logo class="!text-white" /></a>
           <p class="mt-4 max-w-sm">Uči. Primijeni. Rasti. Nova generacija poslovnih edukacija za Hrvatsku i regiju.</p>
-          <p class="mt-6"><a href={`mailto:${site.email}`} class="font-semibold text-ink underline-offset-4 hover:underline">{site.email}</a></p>
+          <p class="mt-6"><a href={`mailto:${site.email}`} class="font-semibold text-neon underline-offset-4 hover:underline">{site.email}</a></p>
         </div>
         <div>
-          <p class="font-display text-lg font-bold text-ink">Platforma</p>
+          <p class="font-display text-lg font-bold text-white">Platforma</p>
           <ul class="mt-4 space-y-2">
-            {nav.map((n) => <li><a href={n.href} class="hover:text-ink">{n.label}</a></li>)}
+            {nav.map((n) => <li><a href={n.href} class="hover:text-neon">{n.label}</a></li>)}
           </ul>
         </div>
         <div>
-          <p class="font-display text-lg font-bold text-ink">Pravno</p>
+          <p class="font-display text-lg font-bold text-white">Pravno</p>
           <ul class="mt-4 space-y-2">
-            <li><a href="/privatnost" class="hover:text-ink">Zaštita privatnosti</a></li>
-            <li><a href="/uvjeti" class="hover:text-ink">Uvjeti korištenja</a></li>
-            <li><a href="/kolacici" class="hover:text-ink">Kolačići</a></li>
+            <li><a href="/privatnost" class="hover:text-neon">Zaštita privatnosti</a></li>
+            <li><a href="/uvjeti" class="hover:text-neon">Uvjeti korištenja</a></li>
+            <li><a href="/kolacici" class="hover:text-neon">Kolačići</a></li>
           </ul>
         </div>
       </div>
-      <div class="border-t border-line">
-        <div class="container-page flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:justify-between">
-          <p>© {year} eduCORE</p>
+      <div class="border-t border-white/10">
+        <div class="container-page flex flex-col gap-2 py-6 text-sm text-white/45 sm:flex-row sm:justify-between">
+          <p>© {year} meet.hr</p>
           <p>Hrvatska • Regija • Online</p>
         </div>
       </div>

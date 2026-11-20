@@ -1,5 +1,5 @@
 /**
- * Šest akademija eduCORE ekosustava (izvor: koncept platforme).
+ * Šest akademija meet.hr ekosustava (izvor: koncept platforme).
  * Tekstovi su prvi prijedlog i mogu se slobodno mijenjati.
  */
 export type Tone = "pink" | "mint" | "butter" | "sky" | "lilac";

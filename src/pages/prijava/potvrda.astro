@@ -33,7 +33,7 @@ const valid = token ? await peekLoginToken(Astro.locals.db, token, now) : null;
     {
       valid ? (
         <div class="rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-ink/5 md:p-10">
-          <h1 class="text-3xl">Prijava na eduCORE</h1>
+          <h1 class="text-3xl">Prijava na meet.hr</h1>
           <p class="mt-4 text-lg text-muted">Prijavljujete se kao <strong class="text-ink">{valid.email}</strong>.</p>
           <form method="post" class="mt-8">
             <button class="btn btn-primary w-full">Prijavi se</button>

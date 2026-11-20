@@ -8,14 +8,14 @@
 
   // ---------------------------------------------------------------------------
   // Lokalni razvoj (astro dev / wrangler). D1 i R2 su lokalni (Miniflare).
-  // Okruženja preview i production dodaju se kad domena educore.hr bude na Cloudflareu.
+  // Okruženja preview i production dodaju se kad domena meet.hr bude na Cloudflareu.
   // ---------------------------------------------------------------------------
   "vars": {
     "APP_ENV": "local",
     "APP_URL": "http://localhost:4321",
-    "EMAIL_FROM": "info@educore.hr",
-    "EMAIL_FROM_NAME": "eduCORE",
-    "INQUIRY_TO": "info@educore.hr",
+    "EMAIL_FROM": "info@meet.hr",
+    "EMAIL_FROM_NAME": "meet.hr",
+    "INQUIRY_TO": "info@meet.hr",
     "EMAIL_TRANSPORT": "log",
     // Adrese koje pri prvoj prijavi automatski dobivaju administratorska prava (odvojene zarezom).
     "ADMIN_EMAILS": "admin@educore.test"
@@ -40,9 +40,9 @@
       "vars": {
         "APP_ENV": "preview",
         "APP_URL": "https://educore-preview.educore-hr.workers.dev",
-        "EMAIL_FROM": "info@educore.hr",
-        "EMAIL_FROM_NAME": "eduCORE (preview)",
-        "INQUIRY_TO": "info@educore.hr",
+        "EMAIL_FROM": "info@meet.hr",
+        "EMAIL_FROM_NAME": "meet.hr (preview)",
+        "INQUIRY_TO": "info@meet.hr",
         "EMAIL_TRANSPORT": "log"
       },
       "d1_databases": [

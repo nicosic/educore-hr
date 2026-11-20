@@ -1,5 +1,5 @@
 /**
- * eduCORE shema (D1 / SQLite, Drizzle).
+ * meet.hr shema (D1 / SQLite, Drizzle).
  *
  * Konvencije (kao u akredo-hr):
  * - ID-jevi su ULID tekst.

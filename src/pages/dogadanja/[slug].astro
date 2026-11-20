@@ -42,7 +42,7 @@ const jsonLd = {
     e.format === "online"
       ? { "@type": "VirtualLocation", url: new URL(`/dogadanja/${e.slug}`, Astro.site).toString() }
       : { "@type": "Place", name: e.venueName, address: [e.venueAddress, e.city].filter(Boolean).join(", ") },
-  organizer: { "@type": "Organization", name: "eduCORE", url: "https://educore.hr" },
+  organizer: { "@type": "Organization", name: "meet.hr", url: "https://meet.hr" },
   performer: lecturers.map((l) => ({ "@type": "Person", name: l.name })),
   offers: ticketsView.map(({ t, price, soldOut }) => ({
     "@type": "Offer",
@@ -53,7 +53,7 @@ const jsonLd = {
   })),
 };
 ---
-<Base title={e.title} description={e.summary ?? e.subtitle ?? `${e.title}: edukacija na eduCORE platformi.`}>
+<Base title={e.title} description={e.summary ?? e.subtitle ?? `${e.title}: edukacija na platformi meet.hr.`}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, "\\u003c")} />
 
   <section class="container-page pt-10 md:pt-14">

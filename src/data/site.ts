@@ -1,12 +1,12 @@
 import type { Tone } from "./academies";
 
 export const site = {
-  name: "eduCORE",
-  url: "https://educore.hr",
+  name: "meet.hr",
+  url: "https://meet.hr",
   tagline: "Znanje koje pokreće ljude i poslovanje.",
   description:
     "Regionalna platforma za edukacije, radionice i profesionalni razvoj. Uživo, online i za tvrtke, s priznatim stručnjacima iz prakse.",
-  email: "info@educore.hr",
+  email: "info@meet.hr",
   // Podaci o tvrtki: popuniti nakon osnivanja d.o.o.-a.
   company: {
     name: "[Naziv tvrtke] d.o.o.",
@@ -37,7 +37,7 @@ export const formats: { title: string; text: string; tone: Tone }[] = [
 ];
 
 export const outcomes: { title: string; text: string; tone: Tone }[] = [
-  { title: "eduCORE potvrde", text: "Potvrda o sudjelovanju za svaku edukaciju koju ste pohađali.", tone: "butter" },
+  { title: "meet.hr potvrde", text: "Potvrda o sudjelovanju za svaku edukaciju koju ste pohađali.", tone: "butter" },
   {
     title: "Međunarodni certifikati",
     text: "Pripreme za međunarodne certifikate u suradnji s ovlaštenim partnerima.",

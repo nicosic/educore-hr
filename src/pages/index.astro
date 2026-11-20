@@ -45,20 +45,20 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
           <p class="text-sm">Prvi masterclass</p>
           <p class="font-display font-bold text-ink">Početak 2027.</p>
         </div>
-        <span class="flex size-10 items-center justify-center rounded-full bg-sun text-ink" aria-hidden="true">→</span>
+        <span class="flex size-10 items-center justify-center rounded-full bg-neon text-ink" aria-hidden="true">→</span>
       </div>
     </div>
   </section>
 
   <!-- Brojke -->
-  <section class="bg-sage">
+  <section class="bg-night">
     <dl class="container-page grid grid-cols-2 gap-y-8 py-10 lg:grid-cols-4">
       {
         stats.map((s, i) => (
-          <div class:list={["px-4 text-center", i % 2 === 1 && "border-l border-line", i > 1 && "lg:border-l"]}>
+          <div class:list={["px-4 text-center", i % 2 === 1 && "border-l border-white/10", i > 1 && "lg:border-l"]}>
             <dt class="sr-only">{s.label}</dt>
-            <dd class="font-display text-4xl font-bold text-ink md:text-5xl">{s.value}</dd>
-            <dd class="mt-1 text-sm">{s.label}</dd>
+            <dd class="font-display text-4xl font-bold text-neon md:text-5xl">{s.value}</dd>
+            <dd class="mt-1 text-sm text-white/60">{s.label}</dd>
           </div>
         ))
       }
@@ -101,7 +101,7 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
           {
             featuredEvent.tags.map((t) => (
               <li class="flex items-center gap-3 font-medium text-ink">
-                <span class="size-2.5 rounded-full bg-sun ring-4 ring-sun/30" aria-hidden="true" />
+                <span class="size-2.5 rounded-full bg-neon-pink ring-4 ring-neon-pink/20" aria-hidden="true" />
                 <span class="first-letter:uppercase">{t}</span>
               </li>
             ))
@@ -123,7 +123,7 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
       {
         academies.map((a, i) => (
           <a href={`/akademije/${a.slug}`} class="group relative block pt-8">
-            <span class="pointer-events-none absolute left-0 top-0 font-display text-6xl font-bold text-ink/[0.07]" aria-hidden="true">
+            <span class="pointer-events-none absolute left-0 top-0 font-display text-6xl font-bold text-neon-pink/25" aria-hidden="true">
               {String(i + 1).padStart(2, "0")}
             </span>
             <h3 class="relative text-2xl">{a.name}</h3>
@@ -148,7 +148,7 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
         {
           formats.map((f, i) => (
             <div class="rounded-[var(--radius-card)] bg-night-card p-8">
-              <svg class="size-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <svg class="size-8 text-neon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d={formatIcons[i]} />
               </svg>
               <h3 class="mt-6 text-xl !text-white">{f.title}</h3>
@@ -156,7 +156,7 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
             </div>
           ))
         }
-        <div class="flex flex-col justify-between gap-8 rounded-[var(--radius-card)] bg-sun p-8 text-ink md:col-span-2 md:flex-row md:items-center md:p-10">
+        <div class="flex flex-col justify-between gap-8 rounded-[var(--radius-card)] bg-neon p-8 text-ink md:col-span-2 md:flex-row md:items-center md:p-10">
           <p class="max-w-md font-display text-3xl font-bold leading-tight md:text-4xl">Trebate edukaciju za cijeli tim?</p>
           <a href="/za-tvrtke" class="btn btn-primary shrink-0 self-start md:self-center">Javite nam se</a>
         </div>
@@ -175,7 +175,7 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
       {
         outcomes.map((o) => (
           <li class="flex gap-5 py-6">
-            <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-sun font-display font-bold text-ink" aria-hidden="true">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-neon font-display font-bold text-ink" aria-hidden="true">
               ✓
             </span>
             <div>
@@ -189,7 +189,7 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
   </section>
 
   <!-- Zajednica -->
-  <section class="bg-stone">
+  <section class="bg-neon-soft">
     <div class="container-page py-20 md:py-28">
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="h-section">Od edukacije do <span class="mark">zajednice</span> znanja</h2>
@@ -211,14 +211,14 @@ const formatIcons = ["M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5", "M3 5h18v11H3zM8
   <!-- CTA -->
   <section class="container-page pt-20 md:pt-28">
     <div class="relative overflow-hidden rounded-[1.75rem] bg-night">
-      <img src={photos.cta.src} alt="" width="1600" height="760" loading="lazy" class="absolute inset-0 size-full object-cover opacity-35" />
+      <img src={photos.cta.src} alt="" width="1600" height="760" loading="lazy" class="absolute inset-0 size-full object-cover opacity-30 mix-blend-luminosity" />
       <div class="relative px-8 py-16 md:px-16 md:py-24">
         <h2 class="h-display max-w-2xl !text-white">Uči. Primijeni. <span class="mark mark-dark">Rasti.</span></h2>
         <p class="mt-6 max-w-lg text-lg text-white/80">
           Prijavite se na nadolazeća događanja ili nam javite kakvu edukaciju trebate za svoj tim.
         </p>
         <div class="mt-10 flex flex-wrap gap-3">
-          <a href="/dogadanja" class="btn bg-white text-ink hover:bg-sun">Nadolazeća događanja</a>
+          <a href="/dogadanja" class="btn bg-neon text-ink hover:bg-white">Nadolazeća događanja</a>
           <a href="/kontakt" class="btn border-[1.5px] border-white text-white hover:bg-white hover:text-ink">Kontakt</a>
         </div>
       </div>
