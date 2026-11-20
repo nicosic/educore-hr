@@ -47,6 +47,8 @@
   }
 
   body {
+    /* Dekorativni sjajevi smiju izaći izvan stupca, ali ne smiju stvoriti vodoravni scroll. */
+    overflow-x: clip;
     font-family: var(--font-sans);
     min-height: 100dvh;
     display: flex;

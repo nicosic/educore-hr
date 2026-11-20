@@ -7,9 +7,9 @@ const u = (id: string, w: number, h: number) =>
 
 export const photos = {
   hero: {
-    src: u("photo-1638957835514-224c57ffe617", 900, 1080),
-    alt: "Polaznici sjede u dvorani i prate predavanje",
-    credit: "Juli Kosolapova, Unsplash",
+    src: u("photo-1784542471032-9ba2b8386ca7", 900, 1080),
+    alt: "Publika u zamračenoj dvorani prati govornika pod reflektorom",
+    credit: "Christian Lue, Unsplash",
   },
   event: {
     src: u("photo-1540575467063-178a50c2df87", 1200, 820),
