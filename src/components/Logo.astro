@@ -2,7 +2,7 @@
 // Logotip meet.hr. Znak je isto neonsko "m" s ružičastom točkom kao ikona weba.
 // variant: "mark" = samo znak, "combo" = znak i naziv, "word" = samo naziv (dosadašnji).
 type Props = { class?: string; variant?: "mark" | "combo" | "word" };
-const { class: cls = "", variant = "word" } = Astro.props;
+const { class: cls = "", variant = "combo" } = Astro.props;
 ---
 {
   variant === "word" ? (
