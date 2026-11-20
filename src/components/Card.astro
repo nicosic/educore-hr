@@ -1,19 +1,21 @@
 ---
-import { toneClass, type Tone } from "@/data/academies";
+// Bijela kartica s tankim rubom; ton akademije ostaje samo kao mali neonski naglasak.
+import type { Tone } from "@/data/academies";
 type Props = { title: string; tone: Tone; href?: string; size?: "md" | "lg" };
 const { title, tone, href, size = "md" } = Astro.props;
 const Tag = href ? "a" : "div";
+const accent = tone === "pink" || tone === "lilac" ? "bg-neon-pink" : "bg-neon";
 ---
 <Tag
   href={href}
   class:list={[
-    "group flex flex-col rounded-[var(--radius-card)] p-7",
-    toneClass[tone],
-    size === "lg" ? "min-h-56" : "min-h-44",
-    href && "transition-transform duration-150 hover:-translate-y-1",
+    "group flex flex-col rounded-[var(--radius-card)] bg-white p-7 ring-1 ring-line",
+    size === "lg" ? "min-h-52" : "min-h-40",
+    href && "transition hover:-translate-y-1 hover:ring-ink",
   ]}
 >
-  <h3 class:list={["font-bold", size === "lg" ? "text-2xl" : "text-xl"]}>
+  <span aria-hidden="true" class:list={["block h-1.5 w-10 rounded-full", accent]}></span>
+  <h3 class:list={["mt-5", size === "lg" ? "text-2xl" : "text-xl"]}>
     {title}
     {href && <span aria-hidden="true" class="ml-1 inline-block transition-transform group-hover:translate-x-1">→</span>}
   </h3>

@@ -3,7 +3,7 @@ import type { GetStaticPaths } from "astro";
 import Base from "@/layouts/Base.astro";
 import Card from "@/components/Card.astro";
 import SectionHeading from "@/components/SectionHeading.astro";
-import { academies, toneClass, type Academy } from "@/data/academies";
+import { academies, type Academy } from "@/data/academies";
 
 export const getStaticPaths = (() => academies.map((a) => ({ params: { slug: a.slug }, props: { academy: a } }))) satisfies GetStaticPaths;
 
@@ -16,7 +16,7 @@ const others = academies.filter((a) => a.slug !== academy.slug);
       <a href="/akademije" class="hover:text-teal">Akademije</a> <span aria-hidden="true">/</span> <span>{academy.name}</span>
     </nav>
     <div class="mt-8">
-      <SectionHeading as="h1" eyebrow={academy.name} title={academy.headline} lead={academy.intro} />
+      <SectionHeading as="h1" eyebrow={academy.name} title={academy.headline} highlight={academy.headline.split(" ").at(-1)} lead={academy.intro} />
     </div>
 
     <div class="mt-12 grid gap-5 md:grid-cols-3">
@@ -25,13 +25,13 @@ const others = academies.filter((a) => a.slug !== academy.slug);
   </section>
 
   <section class="container-page mt-16 grid gap-5 lg:grid-cols-2">
-    <div class:list={["rounded-[var(--radius-card)] p-8 md:p-10", toneClass[academy.tone]]}>
+    <div class="rounded-[var(--radius-card)] bg-stone p-8 md:p-10">
       <h2 class="text-2xl">Kome je namijenjeno</h2>
       <ul class="mt-5 space-y-3 text-lg">
-        {academy.audience.map((x) => <li class="flex gap-3"><span aria-hidden="true" class="mt-2.5 size-2 shrink-0 rounded-full bg-ink"></span>{x}</li>)}
+        {academy.audience.map((x) => <li class="flex gap-3"><span aria-hidden="true" class="mt-2 size-2.5 shrink-0 rounded-full bg-neon-pink ring-4 ring-neon-pink/20"></span>{x}</li>)}
       </ul>
     </div>
-    <div class="flex flex-col justify-between rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-ink/5 md:p-10">
+    <div class="flex flex-col justify-between rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-line md:p-10">
       <div>
         <h2 class="text-2xl">Nadolazeće edukacije</h2>
         <p class="mt-4 text-lg text-muted">Program ove akademije objavljujemo uskoro. Ostavite e-adresu na stranici događanja i javit ćemo vam kad otvorimo prijave.</p>
@@ -44,9 +44,9 @@ const others = academies.filter((a) => a.slug !== academy.slug);
   </section>
 
   <section class="container-page mt-20">
-    <h2 class="text-2xl md:text-3xl">Ostale akademije</h2>
+    <h2 class="h-section">Ostale <span class="mark">akademije</span></h2>
     <ul class="mt-6 flex flex-wrap gap-3">
-      {others.map((o) => <li><a href={`/akademije/${o.slug}`} class:list={["inline-flex rounded-full px-5 py-2.5 font-medium transition-opacity hover:opacity-80", toneClass[o.tone]]}>{o.name}</a></li>)}
+      {others.map((o) => <li><a href={`/akademije/${o.slug}`} class="inline-flex rounded-full border-[1.5px] border-ink px-5 py-2.5 font-medium text-ink transition hover:bg-neon">{o.name}</a></li>)}
     </ul>
   </section>
 </Base>

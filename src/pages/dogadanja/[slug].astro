@@ -1,6 +1,6 @@
 ---
 import Base from "@/layouts/Base.astro";
-import { academyBySlug, toneClass } from "@/data/academies";
+import { academyBySlug } from "@/data/academies";
 import { renderMarkdown } from "@/lib/markdown";
 import { currentPrice, formatEur } from "@/lib/money";
 import { formatRange, formatShortDate } from "@/lib/time";
@@ -63,26 +63,26 @@ const jsonLd = {
       {academy && <a href={`/akademije/${academy.slug}`} class="hover:text-teal">{academy.name}</a>}
     </nav>
 
-    <div class:list={["mt-6 rounded-[var(--radius-card)] p-8 md:p-12", toneClass[academy?.tone ?? "mint"]]}>
+    <div class="mt-6 rounded-[1.75rem] bg-night p-8 text-white/70 md:p-12">
       {e.status === "cancelled" && <p class="mb-4 inline-block rounded-full bg-white px-4 py-1.5 font-semibold text-red-700">Događaj je otkazan</p>}
-      <p class="text-sm font-semibold uppercase tracking-wider text-ink/70">{formatLabel[e.format]}</p>
-      <h1 class="mt-3 text-4xl md:text-6xl">{e.title}</h1>
-      {e.subtitle && <p class="mt-5 max-w-3xl text-xl md:text-2xl">{e.subtitle}</p>}
-      <dl class="mt-8 grid gap-4 text-lg sm:grid-cols-2">
+      <p class="eyebrow !text-neon">{formatLabel[e.format]}</p>
+      <h1 class="h-display mt-4 max-w-4xl !text-white">{e.title}</h1>
+      {e.subtitle && <p class="mt-5 max-w-3xl text-xl text-white/80 md:text-2xl">{e.subtitle}</p>}
+      <dl class="mt-10 grid gap-6 border-t border-white/10 pt-8 text-lg sm:grid-cols-2">
         <div>
-          <dt class="text-sm font-semibold uppercase tracking-wider text-ink/60">Termin</dt>
-          <dd class="mt-1 font-medium">{formatRange(e.startsAt, e.endsAt, e.timezone)}</dd>
+          <dt class="text-sm font-semibold uppercase tracking-wider text-white/45">Termin</dt>
+          <dd class="mt-1 font-medium text-white">{formatRange(e.startsAt, e.endsAt, e.timezone)}</dd>
         </div>
         <div>
-          <dt class="text-sm font-semibold uppercase tracking-wider text-ink/60">Mjesto</dt>
-          <dd class="mt-1 font-medium">
+          <dt class="text-sm font-semibold uppercase tracking-wider text-white/45">Mjesto</dt>
+          <dd class="mt-1 font-medium text-white">
             {e.format !== "online" && [e.venueName, e.venueAddress, e.city].filter(Boolean).join(", ")}
             {e.format === "hybrid" && " ili online"}
             {e.format === "online" && "Online, Zoom (osobna poveznica stiže e-poštom)"}
           </dd>
         </div>
       </dl>
-      {tags.length > 0 && <ul class="mt-8 flex flex-wrap gap-2">{tags.map((t) => <li class="rounded-full bg-white/70 px-4 py-1.5 text-sm font-medium">{t}</li>)}</ul>}
+      {tags.length > 0 && <ul class="mt-8 flex flex-wrap gap-2">{tags.map((t) => <li class="rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white">{t}</li>)}</ul>}
     </div>
   </section>
 
@@ -97,8 +97,8 @@ const jsonLd = {
             <h2 class="text-2xl md:text-3xl">{lecturers.length === 1 ? "Predavač" : "Predavači"}</h2>
             <ul class="mt-6 space-y-5">
               {lecturers.map((l) => (
-                <li class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5">
-                  <p class="text-xl font-bold">{l.name}</p>
+                <li class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-line">
+                  <p class="font-display text-xl font-bold text-ink">{l.name}</p>
                   {l.title && <p class="text-muted">{l.title}</p>}
                   {l.bio && <div class="mt-3 leading-relaxed" set:html={renderMarkdown(l.bio)} />}
                 </li>
@@ -110,23 +110,23 @@ const jsonLd = {
     </div>
 
     <aside id="prijava" class="lg:sticky lg:top-24 lg:self-start">
-      <div class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5 md:p-8">
+      <div class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-line md:p-8">
         <h2 class="text-2xl">Kotizacija</h2>
         <ul class="mt-6 space-y-4">
           {
             ticketsView.map(({ t, price, left, soldOut }) => (
-              <li class="rounded-2xl border border-ink/10 p-4">
+              <li class="rounded-2xl border border-line p-4">
                 <div class="flex items-start justify-between gap-3">
                   <div>
-                    <p class="font-semibold">{t.name}</p>
+                    <p class="font-semibold text-ink">{t.name}</p>
                     <p class="text-sm text-muted">{modeLabel[t.mode]}{t.description && ` • ${t.description}`}</p>
                   </div>
                   <div class="text-right">
-                    <p class="text-lg font-bold">{formatEur(price.cents)}</p>
+                    <p class="font-display text-lg font-bold text-ink">{formatEur(price.cents)}</p>
                     {price.earlyBird && <p class="text-sm text-muted line-through">{formatEur(t.priceCents)}</p>}
                   </div>
                 </div>
-                {price.earlyBird && <p class="mt-2 text-sm font-medium text-teal">Early bird do {formatShortDate(t.earlyBirdUntil!, e.timezone)}</p>}
+                {price.earlyBird && <p class="mt-2 inline-block rounded-full bg-neon px-3 py-0.5 text-sm font-semibold text-ink">Early bird do {formatShortDate(t.earlyBirdUntil!, e.timezone)}</p>}
                 {soldOut && <p class="mt-2 text-sm font-semibold text-red-700">Popunjeno</p>}
                 {left != null && !soldOut && left <= 10 && <p class="mt-2 text-sm font-medium">Još {left} {left === 1 ? "mjesto" : "mjesta"}</p>}
               </li>
@@ -140,7 +140,7 @@ const jsonLd = {
               Prijave uskoro
             </button>
           ) : (
-            <p class="mt-6 rounded-xl bg-cream p-4 text-center font-medium">
+            <p class="mt-6 rounded-xl bg-stone p-4 text-center font-medium">
               {e.status === "cancelled" ? "Događaj je otkazan." : "Prijave su zatvorene."}
             </p>
           )

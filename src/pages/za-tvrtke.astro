@@ -18,6 +18,7 @@ const steps = [
       as="h1"
       eyebrow="Za tvrtke"
       title="Edukacija po mjeri vašeg tima"
+      highlight="vašeg tima"
       lead="Zatvoreni programi za tvrtke, javni sektor i profesionalne udruge. Teme biramo prema stvarnim izazovima vaše organizacije, a predavači dolaze iz prakse."
     />
     <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -27,12 +28,12 @@ const steps = [
 
   <section id="forma" class="container-page mt-20 grid gap-10 lg:grid-cols-[1fr_1.4fr]">
     <div>
-      <h2 class="text-3xl md:text-4xl">Pošaljite upit</h2>
+      <h2 class="h-section">Pošaljite <span class="mark">upit</span></h2>
       <p class="mt-4 text-lg text-muted">Recite nam ukratko što vam treba. Javit ćemo vam se u roku od dva radna dana s prijedlogom termina za razgovor.</p>
       <p class="mt-6 text-muted">Za grupne prijave na javne edukacije ne trebate upit: prijavite više polaznika odjednom izravno na stranici događaja.</p>
     </div>
 
-    <form method="post" action="/api/upit?vrsta=tvrtke" class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5 md:p-8">
+    <form method="post" action="/api/upit?vrsta=tvrtke" class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-line md:p-8">
       <FormStatus success="Hvala! Zaprimili smo upit i javit ćemo vam se uskoro." />
       <div class="grid gap-5 sm:grid-cols-2">
         <label class="block">

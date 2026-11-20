@@ -10,6 +10,7 @@ import { community, pillars } from "@/data/site";
       as="h1"
       eyebrow="O nama"
       title="Nova generacija poslovnih edukacija"
+      highlight="generacija"
       lead="meet.hr smo pokrenuli jer vjerujemo da dobra edukacija mora biti dvije stvari odjednom: inspirativna i odmah primjenjiva. Okupljamo stručnjake koji o temama ne samo govore, nego ih svakodnevno rješavaju u praksi."
     />
   </section>
@@ -32,11 +33,11 @@ import { community, pillars } from "@/data/site";
   </section>
 
   <section class="container-page mt-20">
-    <h2 class="text-3xl md:text-4xl">Zajednica znanja</h2>
+    <h2 class="h-section">Zajednica <span class="mark">znanja</span></h2>
     <div class="mt-8 grid gap-5 md:grid-cols-3">
       {community.map((c) => <Card title={c.title} tone={c.tone}><p>{c.text}</p></Card>)}
     </div>
-    <div class="mt-10 rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-ink/5 md:flex md:items-center md:justify-between md:gap-8">
+    <div class="mt-10 rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-line md:flex md:items-center md:justify-between md:gap-8">
       <div>
         <h3 class="text-2xl">Želite predavati na meet.hr?</h3>
         <p class="mt-2 text-muted">Tražimo stručnjake iz prakse koji znanje znaju prenijeti jasno i konkretno.</p>

@@ -1,9 +1,14 @@
 ---
-type Props = { eyebrow?: string; title: string; lead?: string; as?: "h1" | "h2" };
-const { eyebrow, title, lead, as: H = "h2" } = Astro.props;
+// highlight: riječ (ili dio naslova) koja dobiva neonski marker, kao na naslovnici.
+type Props = { eyebrow?: string; title: string; highlight?: string; lead?: string; as?: "h1" | "h2"; center?: boolean };
+const { eyebrow, title, highlight, lead, as: H = "h2", center = false } = Astro.props;
+const at = highlight ? title.indexOf(highlight) : -1;
+const parts = at >= 0 ? [title.slice(0, at), highlight!, title.slice(at + highlight!.length)] : null;
 ---
-<div class="max-w-3xl">
+<div class:list={["max-w-3xl", center && "mx-auto text-center"]}>
   {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-  <H class:list={["mt-3", H === "h1" ? "h-display" : "h-section"]}>{title}</H>
-  {lead && <p class="mt-5 text-lg text-muted md:text-xl">{lead}</p>}
+  <H class:list={["mt-3", H === "h1" ? "h-display" : "h-section"]}>
+    {parts ? <>{parts[0]}<span class="mark">{parts[1]}</span>{parts[2]}</> : title}
+  </H>
+  {lead && <p class="mt-5 text-lg text-muted">{lead}</p>}
 </div>

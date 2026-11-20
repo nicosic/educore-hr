@@ -32,7 +32,7 @@ const valid = token ? await peekLoginToken(Astro.locals.db, token, now) : null;
   <section class="container-page max-w-xl py-16 md:py-24">
     {
       valid ? (
-        <div class="rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-ink/5 md:p-10">
+        <div class="rounded-[var(--radius-card)] bg-white p-8 ring-1 ring-line md:p-10">
           <h1 class="text-3xl">Prijava na meet.hr</h1>
           <p class="mt-4 text-lg text-muted">Prijavljujete se kao <strong class="text-ink">{valid.email}</strong>.</p>
           <form method="post" class="mt-8">

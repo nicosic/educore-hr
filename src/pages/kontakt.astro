@@ -7,7 +7,7 @@ import { site } from "@/data/site";
 <Base title="Kontakt" description="Javite nam se s pitanjem o edukacijama, prijavama, suradnji ili predavanju na platformi meet.hr.">
   <section class="container-page grid gap-12 pt-14 md:pt-20 lg:grid-cols-[1fr_1.3fr]">
     <div>
-      <SectionHeading as="h1" eyebrow="Kontakt" title="Razgovarajmo" lead="Pitanje o edukaciji, prijavi ili računu? Želite predavati ili surađivati? Pišite nam." />
+      <SectionHeading as="h1" eyebrow="Kontakt" title="Razgovarajmo" highlight="Razgovarajmo" lead="Pitanje o edukaciji, prijavi ili računu? Želite predavati ili surađivati? Pišite nam." />
       <dl class="mt-10 space-y-6 text-lg">
         <div>
           <dt class="text-sm font-semibold uppercase tracking-wider text-muted">E-pošta</dt>
@@ -20,7 +20,7 @@ import { site } from "@/data/site";
       </dl>
     </div>
 
-    <form id="forma" method="post" action="/api/upit?vrsta=kontakt" class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-ink/5 md:p-8">
+    <form id="forma" method="post" action="/api/upit?vrsta=kontakt" class="rounded-[var(--radius-card)] bg-white p-6 ring-1 ring-line md:p-8">
       <FormStatus success="Hvala! Zaprimili smo poruku i javit ćemo vam se uskoro." />
       <div class="grid gap-5 sm:grid-cols-2">
         <label class="block">
